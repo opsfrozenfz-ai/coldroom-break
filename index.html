@@ -257,16 +257,15 @@
                 <i class="fa-solid fa-file-Spreadsheet text-emerald-600"></i>
                 <span id="gsheetHeaderText">Google Sheets: พร้อมตั้งค่า</span>
               </button>
-              <a
-                href="tv.html"
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                type="button"
+                onclick="downloadTvHtmlFile()"
                 class="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-slate-900 hover:bg-slate-800 text-sky-300 border border-slate-700 flex items-center gap-1.5 transition shadow-sm"
-                title="เปิดหน้าจอทีวีมอนิเตอร์ (tv.html) ในแท็บใหม่"
+                title="ดาวน์โหลดไฟล์ tv.html ที่ฝังลิงก์ Google Sheets ของคุณเรียบร้อยแล้ว"
               >
                 <i class="fa-solid fa-tv text-sky-400"></i>
-                <span>เปิดจอ TV (tv.html)</span>
-              </a>
+                <span>ดาวน์โหลดไฟล์จอ TV (tv.html)</span>
+              </button>
             </div>
             <p class="text-xs sm:text-sm text-slate-600 mt-0.5 font-myanmar">
               เงื่อนไขโควตา: งานปกติ 8 ชม. (ทำ 45 พัก 15 นาที = 120 น.) + พักทานข้าว 1 ชม. 20 นาที (80 น.) + OT ชม.ละ 15 นาที
@@ -1042,11 +1041,19 @@
           <div class="flex flex-wrap items-center gap-2">
             <button
               type="button"
+              onclick="downloadTvHtmlFile()"
+              class="px-4 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs sm:text-sm font-bold shadow-sm flex items-center gap-2 transition"
+            >
+              <i class="fa-solid fa-tv"></i>
+              <span>ดาวน์โหลดไฟล์ tv.html (ฝังลิงก์ Sheet แล้ว)</span>
+            </button>
+            <button
+              type="button"
               onclick="toggleAppsScriptGuideModal()"
               class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs sm:text-sm font-bold shadow-sm flex items-center gap-2 transition"
             >
               <i class="fa-solid fa-code text-emerald-400"></i>
-              <span>ดูโค้ด Google Apps Script (Code.gs) & วิธีติดตั้ง</span>
+              <span>ซ่อน / แสดงโค้ดทั้งหมด (Code.gs & tv.html)</span>
             </button>
           </div>
         </div>
@@ -1113,20 +1120,21 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <button
                 type="button"
-                onclick="syncAllLogsToGoogleSheet()"
+                onclick="pushLiveStateToGoogleSheet('MANUAL_LIVE_SYNC', {}, true)"
                 class="p-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm flex items-center justify-center gap-1.5 transition"
+                title="ส่งรายชื่อผู้กำลังพักเบรกสด (Active_Breaks) + โควตา + พนักงาน ขึ้น Google Sheets ทันที"
               >
-                <i class="fa-solid fa-cloud-arrow-up"></i>
-                <span>ส่งประวัติสแกนขึ้น Sheet</span>
+                <i class="fa-solid fa-bolt"></i>
+                <span>ซิงค์ Active_Breaks ขึ้น Sheet</span>
               </button>
 
               <button
                 type="button"
-                onclick="syncQuotaToGoogleSheet()"
+                onclick="syncAllLogsToGoogleSheet()"
                 class="p-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm flex items-center justify-center gap-1.5 transition"
               >
-                <i class="fa-solid fa-chart-pie"></i>
-                <span>ส่งสรุปโควตาวันขึ้น Sheet</span>
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                <span>ส่งประวัติสแกนทั้งหมดขึ้น Sheet</span>
               </button>
 
               <button
@@ -1140,9 +1148,9 @@
 
               <button
                 type="button"
-                onclick="pullDataFromGoogleSheet()"
+                onclick="pullDataFromGoogleSheet(false)"
                 class="p-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold shadow-sm flex items-center justify-center gap-1.5 transition"
-                title="ดึงข้อมูลประวัติการสแกนและรายชื่อพนักงานจาก Google Sheets กลับมาแสดงในแอป"
+                title="ดึงข้อมูลผู้กำลังพักเบรก ประวัติการสแกน และรายชื่อพนักงานจาก Google Sheets กลับมาแสดงในแอป"
               >
                 <i class="fa-solid fa-cloud-arrow-down"></i>
                 <span>ดึงข้อมูลจาก Sheet เข้าแอป</span>
@@ -1155,55 +1163,69 @@
           </div>
         </div>
 
-        <!-- Expandable Google Apps Script Code & Setup Instructions -->
-        <div id="appsScriptGuideBox" class="hidden mt-5 pt-4 border-t-2 border-dashed border-emerald-300 space-y-4">
+        <!-- Expandable Google Apps Script Code & Setup Instructions (OPEN BY DEFAULT) -->
+        <div id="appsScriptGuideBox" class="mt-5 pt-4 border-t-2 border-dashed border-emerald-300 space-y-4">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-slate-900 text-white p-4 rounded-xl">
             <div>
               <h4 class="text-sm sm:text-base font-bold text-emerald-400 flex items-center gap-2">
                 <i class="fa-solid fa-terminal"></i>
-                ขั้นตอนการติดตั้งโค้ดใน Google Sheets (ใช้เวลาเพียง 1 นาที)
+                โค้ดหลังบ้าน Google Apps Script (Code.gs) ฉบับสมบูรณ์ (บันทึกเวลา Active_Breaks ครบถ้วน)
               </h4>
               <p class="text-xs text-slate-300 mt-0.5">
-                โค้ดนี้จะสร้างแผ่นงาน (Sheet Tab) ให้เองอัตโนมัติ 3 แผ่น: <code class="text-sky-300">Break_Logs</code>, <code class="text-sky-300">Daily_Quota</code> และ <code class="text-sky-300">Employees</code>
+                สร้างและเชื่อมโยง 5 แผ่นงานอัตโนมัติ: <code class="text-sky-300">Active_Breaks</code> (พร้อมเวลาเริ่มพัก & เวลาครบกำหนด), <code class="text-sky-300">Break_Logs</code>, <code class="text-sky-300">Daily_Quota</code>, <code class="text-sky-300">Employees</code> และ <code class="text-sky-300">Daily_OT</code>
               </p>
             </div>
-            <button
-              type="button"
-              onclick="copyAppsScriptCode()"
-              class="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs sm:text-sm font-bold shadow-md shrink-0 flex items-center gap-2 transition"
-            >
-              <i class="fa-solid fa-copy"></i>
-              <span>คัดลอกโค้ด Google Apps Script (Code.gs)</span>
-            </button>
+            <div class="flex flex-wrap items-center gap-2 shrink-0">
+              <button
+                type="button"
+                onclick="copyAppsScriptCode()"
+                class="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs sm:text-sm font-bold shadow-md flex items-center gap-2 transition"
+              >
+                <i class="fa-solid fa-copy"></i>
+                <span>คัดลอกโค้ด Code.gs</span>
+              </button>
+              <button
+                type="button"
+                onclick="downloadAppsScriptFile()"
+                class="px-3.5 py-2.5 rounded-xl bg-slate-700 hover:bg-slate-600 text-white text-xs sm:text-sm font-bold shadow-md flex items-center gap-1.5 transition"
+              >
+                <i class="fa-solid fa-download"></i>
+                <span>โหลด Code.gs</span>
+              </button>
+            </div>
           </div>
 
           <!-- 4 Simple Steps -->
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
             <div class="p-3 rounded-xl bg-white border border-slate-200">
-              <div class="font-bold text-emerald-700 mb-1">1. เปิดไฟล์ Google Sheets</div>
-              <p class="text-slate-600">สร้างไฟล์ Google Sheets ใหม่ แล้วไปที่เมนูด้านบน <strong>ส่วนขยาย (Extensions) &rarr; Apps Script</strong></p>
+              <div class="font-bold text-emerald-700 mb-1">1. วางโค้ด Code.gs ใหม่</div>
+              <p class="text-slate-600">ในหน้า <strong>Extensions &rarr; Apps Script</strong> ให้ลบโค้ดเดิมออกทั้งหมด แล้วกดปุ่ม <strong>คัดลอกโค้ด Code.gs</strong> ด้านบนไปวางแทนที่และกด Save (💾)</p>
             </div>
             <div class="p-3 rounded-xl bg-white border border-slate-200">
-              <div class="font-bold text-emerald-700 mb-1">2. วางโค้ด `Code.gs` ด้านล่าง</div>
-              <p class="text-slate-600">ลบโค้ดเดิมในหน้าจอ Apps Script ออกทั้งหมด แล้วกดปุ่ม <strong>คัดลอกโค้ด</strong> ด้านบนไปวางแทนที่ จากนั้นกดบันทึก (💾)</p>
+              <div class="font-bold text-emerald-700 mb-1">2. อัปเดตการ Deploy (สำคัญ!)</div>
+              <p class="text-slate-600">กด <strong>การทำให้ใช้งานได้ (Deploy) &rarr; จัดการการทำให้ใช้งานได้ &rarr; แก้ไข (✏️) &rarr; รุ่นใหม่ (New version)</strong> แล้วกด Deploy เพื่อให้โค้ดใหม่ทำงาน</p>
             </div>
             <div class="p-3 rounded-xl bg-white border border-slate-200">
-              <div class="font-bold text-emerald-700 mb-1">3. กดการทำให้ใช้งานได้ (Deploy)</div>
-              <p class="text-slate-600">คลิกปุ่ม <strong>การทำให้ใช้งานได้ &rarr; การทำให้ใช้งานได้รายการใหม่</strong> เลือกประเภทเป็น <strong>เว็บแอป (Web App)</strong> และตั้งค่าผู้มีสิทธิ์เข้าถึงเป็น <strong>"ทุกคน (Anyone)"</strong></p>
+              <div class="font-bold text-emerald-700 mb-1">3. กดปุ่มซิงค์ Active_Breaks</div>
+              <p class="text-slate-600">กดปุ่มสีเขียว <strong>"ซิงค์ Active_Breaks ขึ้น Sheet"</strong> ด้านบน 1 ครั้ง ระบบจะส่งเวลาเริ่มพักและเวลาครบกำหนดเข้าชีตทันที</p>
             </div>
             <div class="p-3 rounded-xl bg-white border border-slate-200">
-              <div class="font-bold text-emerald-700 mb-1">4. คัดลอก URL มาวางในแอป</div>
-              <p class="text-slate-600">คัดลอก <strong>Web App URL (`.../exec`)</strong> มาวางในช่องด้านบน แล้วกดปุ่ม <strong>บันทึก URL</strong> เป็นอันเสร็จสมบูรณ์!</p>
+              <div class="font-bold text-emerald-700 mb-1">4. ดาวน์โหลดไฟล์ tv.html</div>
+              <p class="text-slate-600">กดปุ่มสีฟ้า <strong>"ดาวน์โหลดไฟล์ tv.html"</strong> เพื่อรับไฟล์หน้าจอทีวีที่ฝังลิงก์ Google Sheets เดียวกันพร้อมอัปขึ้น GitHub Pages</p>
             </div>
           </div>
 
           <!-- Read-only Textarea containing the complete Google Apps Script Code.gs -->
           <div class="relative">
+            <div class="flex items-center justify-between bg-slate-900 text-slate-300 px-4 py-2 rounded-t-xl border border-b-0 border-slate-800 text-xs font-mono">
+              <span>📄 ไฟล์ที่ 1: Code.gs (สำหรับวางใน Google Sheets &rarr; Extensions &rarr; Apps Script)</span>
+              <span class="text-emerald-400 font-bold">เชื่อมโยงกับ index.html และ tv.html 100%</span>
+            </div>
             <textarea
               id="appsScriptCodeTextarea"
               readonly
-              rows="14"
-              class="w-full p-4 rounded-xl bg-slate-950 text-emerald-300 font-mono text-xs leading-relaxed border border-slate-800 focus:outline-none"
+              rows="16"
+              class="w-full p-4 rounded-b-xl bg-slate-950 text-emerald-300 font-mono text-xs leading-relaxed border border-slate-800 focus:outline-none"
             ></textarea>
           </div>
         </div>
@@ -1618,7 +1640,7 @@
      * วางลิงก์ที่ได้จากการ Deploy (ลงท้ายด้วย /exec) ลงในเครื่องหมายคำพูดด้านล่างนี้
      * เมื่ออัปโหลดขึ้น GitHub Pages แล้ว ทุกเครื่องและหน้าจอทีวี (tv.html) จะดึง-ส่งข้อมูลชุดเดียวกันอัตโนมัติ
      ****************************************************************************************************/
-    const DEFAULT_GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyGuyvxYWTRATeoGSZm5KZVYRol9pXDUCTmahPj6MM0m6Di3Fq4p-wy3UFEILHsvillZA/exec"; // <-- วางลิงก์ https://script.google.com/macros/s/.../exec ตรงนี้
+    const DEFAULT_GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxXU09E1IT1OX7E5zChPWs6RGKpGpdzXq-LrB-I5atgVtLj8kragj-Y3J0zoPU62VQofg/exec"; // <-- วางลิงก์ https://script.google.com/macros/s/.../exec ตรงนี้
 
     // ความถี่ในการดึงข้อมูลสดจาก Google Sheets อัตโนมัติ (15000 ms = 15 วินาที)
     const AUTO_PULL_GOOGLE_SHEETS_MS = 15000;
@@ -1692,6 +1714,8 @@
     let currentTab = 'kiosk';
     let cameraStream = null;
     let lastAlarmBeepSec = 0;
+    let isPushingToGoogleSheet = false;
+    let lastGoogleSheetPushMs = 0;
 
     // Cloud Firestore variables
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'cold-room-break-tracker';
@@ -3584,77 +3608,104 @@
 
     /********************************************************************
      * 7.5 GOOGLE SHEETS + GOOGLE APPS SCRIPT INTEGRATION ENGINE
-     * รองรับการซิงค์ Active_Breaks, Break_Logs, Daily_Quota, Employees, Daily_OT
-     * สำหรับใช้งานบน GitHub Pages คู่กับหน้าจอทีวี (tv.html)
+     * เชื่อมโยงข้อมูลตรงกัน 100% ระหว่าง index.html <-> Code.gs <-> tv.html
+     * บันทึกทั้งเวลาอ่านง่าย (HH:mm:ss) และ Timestamp (ms) ใน Active_Breaks
      ********************************************************************/
     const GOOGLE_APPS_SCRIPT_TEMPLATE_CODE = `/**
  * ============================================================================
- * โค้ดหลังบ้าน Google Apps Script (Code.gs) สำหรับ GitHub Pages (index.html + tv.html)
+ * โค้ดหลังบ้าน Google Apps Script (Code.gs) ฉบับสมบูรณ์
+ * เชื่อมโยงข้อมูลตรงกัน 100% ระหว่าง index.html, tv.html และ Google Sheets
  * ============================================================================
- * วิธีติดตั้ง:
- * 1. เปิดไฟล์ Google Sheets -> ไปที่เมนู "ส่วนขยาย (Extensions)" -> "Apps Script"
- * 2. ลบโค้ดเดิมออกทั้งหมด แล้ววางโค้ดนี้ลงไป กดปุ่มบันทึก (Save)
- * 3. กดปุ่ม "การทำให้ใช้งานได้ (Deploy)" -> "การทำให้ใช้งานได้รายการใหม่ (New deployment)"
- * 4. เลือกประเภทเป็น "เว็บแอป (Web App)"
- *    - ดำเนินการในฐานะ (Execute as): "ฉัน (Me)"
- *    - ผู้มีสิทธิ์เข้าถึง (Who has access): "ทุกคน (Anyone)"
- * 5. คัดลอก Web App URL (https://script.google.com/macros/s/.../exec)
- *    ไปใส่ในตัวแปร DEFAULT_GOOGLE_SCRIPT_URL ในไฟล์ index.html และ tv.html
+ * วิธีอัปเดตโค้ดใน Google Sheets:
+ * 1. เปิดไฟล์ Google Sheets -> ส่วนขยาย (Extensions) -> Apps Script
+ * 2. ลบโค้ดเดิมออกทั้งหมด แล้ววางโค้ดนี้ลงไป กดบันทึก (Save)
+ * 3. กด "การทำให้ใช้งานได้ (Deploy)" -> "จัดการการทำให้ใช้งานได้ (Manage deployments)"
+ *    -> คลิกไอคอนดินสอ (แก้ไข) -> เลือก Version เป็น "รุ่นใหม่ (New version)" -> กด Deploy
  */
 
 function setupSheets_() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-  getOrCreateSheet_(ss, "Active_Breaks", [
+
+  // 1. แผ่นงาน Active_Breaks (มีทั้งคอลัมน์เวลาเริ่มพัก HH:mm:ss, เวลาครบกำหนด HH:mm:ss และ startTimestamp)
+  var activeHeaders = [
     "empId", "empName", "nickname", "myanmarName", "zone",
-    "breakType", "limitMinutes", "startTimestamp", "dateKey"
-  ]);
-  getOrCreateSheet_(ss, "Break_Logs", [
+    "breakType", "limitMinutes", "startTimestamp", "dateKey",
+    "เวลาเริ่มพัก (startTime)", "เวลาครบกำหนด (expectedEndTime)"
+  ];
+  var activeSheet = getOrCreateSheet_(ss, "Active_Breaks", activeHeaders);
+  ensureHeaders_(activeSheet, activeHeaders);
+
+  // 2. แผ่นงาน Break_Logs (บันทึกทุกการสแกนเริ่มพัก และสแกนกลับเข้าห้องเย็น)
+  var logHeaders = [
     "วันที่ (Date)", "เวลาบันทึก", "ประเภทเหตุการณ์", "รหัสพนักงาน", "PIN",
     "ชื่อ-นามสกุล", "ชื่อเล่น", "โซนห้องเย็น", "ประเภทการพัก",
     "เวลาเริ่มพัก (In)", "เวลากลับเข้า (Out)", "โควตารอบนี้ (นาที)",
     "เวลาที่ใช้จริง", "สถานะ", "สะสมวันนี้ (นาที)", "โควตาวันนี้ (นาที)",
     "คงเหลือวันนี้ (นาที)", "หมายเหตุ", "startTimeMs", "endTimeMs", "actualDurationSec"
-  ]);
-  getOrCreateSheet_(ss, "Daily_Quota", [
+  ];
+  var logSheet = getOrCreateSheet_(ss, "Break_Logs", logHeaders);
+  ensureHeaders_(logSheet, logHeaders);
+
+  // 3. แผ่นงาน Daily_Quota (สรุปโควตารายบุคคลประจำวัน)
+  var quotaHeaders = [
     "วันที่ (Date)", "รหัสพนักงาน", "ชื่อ-นามสกุล", "ชื่อเล่น", "โซนห้องเย็น",
     "ชั่วโมง OT", "โควตาเบรกหนาว (นาที)", "เบรกหนาวใช้จริง (นาที)",
     "โควตาทานข้าว (นาที)", "ทานข้าวใช้จริง (นาที)", "โควตารวมทั้งวัน (นาที)",
     "ใช้จริงรวมทั้งวัน (นาที)", "คงเหลือ/เกิน (นาที)", "สถานะโควตา"
-  ]);
-  getOrCreateSheet_(ss, "Employees", [
+  ];
+  getOrCreateSheet_(ss, "Daily_Quota", quotaHeaders);
+
+  // 4. แผ่นงาน Employees (รายชื่อพนักงานห้องเย็น)
+  var empHeaders = [
     "รหัสพนักงาน (EMP_ID)", "รหัสผ่าน (PIN)", "ชื่อ-นามสกุล", "ชื่อเล่น",
     "ชื่อเมียนมา", "สัญชาติ", "โซนห้องเย็น", "ตำแหน่ง", "ชั่วโมง OT วันนี้"
-  ]);
-  getOrCreateSheet_(ss, "Daily_OT", [
-    "otKey", "otHours", "updatedAt"
-  ]);
+  ];
+  getOrCreateSheet_(ss, "Employees", empHeaders);
+
+  // 5. แผ่นงาน Daily_OT (ชั่วโมงโอทีรายวัน)
+  var otHeaders = ["otKey", "otHours", "updatedAt"];
+  getOrCreateSheet_(ss, "Daily_OT", otHeaders);
+
   return ss;
 }
 
 function doPost(e) {
+  var lock = LockService.getScriptLock();
+  lock.tryLock(10000);
   try {
     var ss = setupSheets_();
+    var timeZone = ss.getSpreadsheetTimeZone() || "Asia/Bangkok";
     var raw = e.postData && e.postData.contents ? e.postData.contents : "{}";
     var payload = JSON.parse(raw);
     var action = payload.action || "LIVE_SYNC";
 
-    // 1) อัปเดตกระดานผู้กำลังพักเบรกสด (Active_Breaks) เพื่อให้หน้าจอ TV (tv.html) เห็นทันที
+    // 1) อัปเดตกระดานผู้กำลังพักเบรกสด (Active_Breaks) พร้อมเวลาเริ่มพักและเวลาครบกำหนด
     if (Array.isArray(payload.activeBreaks)) {
       var activeSheet = ss.getSheetByName("Active_Breaks");
       if (activeSheet.getLastRow() > 1) {
-        activeSheet.getRange(2, 1, activeSheet.getLastRow() - 1, activeSheet.getLastColumn()).clearContent();
+        activeSheet.getRange(2, 1, activeSheet.getLastRow() - 1, activeSheet.getMaxColumns()).clearContent();
       }
       var activeRows = payload.activeBreaks.map(function(a) {
+        var limitMins = Number(a.limitMinutes) || (String(a.breakType).toLowerCase() === "meal" ? 80 : 15);
+        var startMs = Number(a.startTimestamp || a.startTimeMs) || Date.now();
+        var endMs = startMs + (limitMins * 60 * 1000);
+
+        var startTimeText = a.startTime || Utilities.formatDate(new Date(startMs), timeZone, "HH:mm:ss");
+        var expectedEndText = a.expectedEndTime || Utilities.formatDate(new Date(endMs), timeZone, "HH:mm:ss");
+        var dateKeyText = a.dateKey || Utilities.formatDate(new Date(startMs), timeZone, "yyyy-MM-dd");
+
         return [
-          a.empId || "",
-          a.empName || "",
-          a.nickname || "",
-          a.myanmarName || "",
-          a.zone || "",
-          a.breakType || "cold",
-          Number(a.limitMinutes) || 15,
-          Number(a.startTimestamp || a.startTimeMs) || Date.now(),
-          a.dateKey || ""
+          String(a.empId || ""),
+          String(a.empName || ""),
+          String(a.nickname || ""),
+          String(a.myanmarName || ""),
+          String(a.zone || ""),
+          String(a.breakType || "cold"),
+          limitMins,
+          startMs,
+          "'" + dateKeyText,
+          "'" + startTimeText,
+          "'" + expectedEndText
         ];
       });
       if (activeRows.length > 0) {
@@ -3662,32 +3713,33 @@ function doPost(e) {
       }
     }
 
-    // 2) บันทึกแถวการสแกนลงแผ่นงาน Break_Logs
+    // 2) บันทึกแถวการสแกนลงแผ่นงาน Break_Logs (รองรับทั้ง START_BREAK, END_BREAK และ appendLog)
     var scanRec = payload.scanRecord || (action === "LOG_SCAN" ? payload : null);
     if (scanRec && scanRec.empId) {
       var logSheet = ss.getSheetByName("Break_Logs");
+      var logItem = payload.logItem || {};
       logSheet.appendRow([
-        scanRec.dateKey || "",
-        scanRec.timestamp || "",
-        scanRec.eventType || "SCAN",
+        "'" + (scanRec.dateKey || Utilities.formatDate(new Date(), timeZone, "yyyy-MM-dd")),
+        "'" + (scanRec.timestamp || Utilities.formatDate(new Date(), timeZone, "HH:mm:ss")),
+        scanRec.eventType || action,
         scanRec.empId || "",
-        scanRec.pin || "",
+        "'" + (scanRec.pin || ""),
         scanRec.name || "",
         scanRec.nickname || "",
         scanRec.zone || "",
         scanRec.breakType || "",
-        scanRec.startTime || "",
-        scanRec.endTime || "",
-        scanRec.targetMinutes || 15,
-        scanRec.actualDuration || "",
+        "'" + (scanRec.startTime || ""),
+        "'" + (scanRec.endTime || "-"),
+        Number(scanRec.targetMinutes) || 15,
+        "'" + (scanRec.actualDuration || ""),
         scanRec.status || "",
-        scanRec.dailyTotalUsedMin || 0,
-        scanRec.dailyQuotaMin || 200,
-        scanRec.dailyRemainingMin || 200,
+        Number(scanRec.dailyTotalUsedMin) || 0,
+        Number(scanRec.dailyQuotaMin) || 200,
+        Number(scanRec.dailyRemainingMin) || 200,
         scanRec.note || "",
-        payload.logItem ? payload.logItem.startTimeMs : "",
-        payload.logItem ? payload.logItem.endTimeMs : "",
-        payload.logItem ? payload.logItem.durationSec : ""
+        logItem.startTimeMs || "",
+        logItem.endTimeMs || "",
+        logItem.durationSec || scanRec.actualSeconds || ""
       ]);
     }
 
@@ -3695,16 +3747,31 @@ function doPost(e) {
     if (action === "SYNC_ALL_LOGS" && Array.isArray(payload.logs)) {
       var sheet = ss.getSheetByName("Break_Logs");
       if (sheet.getLastRow() > 1) {
-        sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn()).clearContent();
+        sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getMaxColumns()).clearContent();
       }
       var rows = payload.logs.map(function(r) {
         return [
-          r.dateKey || "", r.endTime || r.startTime || "", "COMPLETED_LOG",
-          r.empId || "", r.pin || "", r.name || "", r.nickname || "",
-          r.zone || "", r.breakType || "", r.startTime || "", r.endTime || "",
-          r.targetMinutes || 15, r.actualDuration || "", r.status || "",
-          r.dailyTotalUsedMin || "", r.dailyQuotaMin || "", r.dailyRemainingMin || "",
-          r.note || "", r.startTimeMs || "", r.endTimeMs || "", r.actualDurationSec || ""
+          "'" + (r.dateKey || ""),
+          "'" + (r.endTime || r.startTime || ""),
+          "COMPLETED_LOG",
+          r.empId || "",
+          "'" + (r.pin || ""),
+          r.name || "",
+          r.nickname || "",
+          r.zone || "",
+          r.breakType || "",
+          "'" + (r.startTime || ""),
+          "'" + (r.endTime || ""),
+          Number(r.targetMinutes) || 15,
+          "'" + (r.actualDuration || ""),
+          r.status || "",
+          r.dailyTotalUsedMin || 0,
+          r.dailyQuotaMin || 200,
+          r.dailyRemainingMin || 200,
+          r.note || "",
+          r.startTimeMs || "",
+          r.endTimeMs || "",
+          r.actualDurationSec || ""
         ];
       });
       if (rows.length > 0) {
@@ -3712,15 +3779,15 @@ function doPost(e) {
       }
     }
 
-    // 4) ซิงค์ตารางสรุปโควตารายบุคคลประจำวัน (SYNC_QUOTA_SUMMARY)
+    // 4) ซิงค์ตารางสรุปโควตารายบุคคลประจำวัน (Daily_Quota)
     if (Array.isArray(payload.quotas) && payload.quotas.length > 0) {
       var qSheet = ss.getSheetByName("Daily_Quota");
       if (qSheet.getLastRow() > 1) {
-        qSheet.getRange(2, 1, qSheet.getLastRow() - 1, qSheet.getLastColumn()).clearContent();
+        qSheet.getRange(2, 1, qSheet.getLastRow() - 1, qSheet.getMaxColumns()).clearContent();
       }
       var qRows = payload.quotas.map(function(q) {
         return [
-          q.dateKey, q.empId, q.name, q.nickname, q.zone,
+          "'" + (q.dateKey || ""), q.empId, q.name, q.nickname, q.zone,
           q.otHours, q.coldQuotaMin, q.coldUsedMin,
           q.mealQuotaMin, q.mealUsedMin, q.totalQuotaMin,
           q.totalUsedMin, q.remainingMin, q.statusText
@@ -3733,13 +3800,13 @@ function doPost(e) {
     if (Array.isArray(payload.employees) && payload.employees.length > 0) {
       var empSheet = ss.getSheetByName("Employees");
       if (empSheet.getLastRow() > 1) {
-        empSheet.getRange(2, 1, empSheet.getLastRow() - 1, empSheet.getLastColumn()).clearContent();
+        empSheet.getRange(2, 1, empSheet.getLastRow() - 1, empSheet.getMaxColumns()).clearContent();
       }
       var empRows = payload.employees.map(function(emp) {
         return [
-          emp.id, emp.pin, emp.name, emp.nickname,
+          emp.id, "'" + emp.pin, emp.name, emp.nickname,
           emp.myanmarName || "", emp.nation || "TH", emp.zone || "",
-          emp.role || "", emp.otHours || 0
+          emp.role || "", Number(emp.otHours) || 0
         ];
       });
       empSheet.getRange(2, 1, empRows.length, empRows[0].length).setValues(empRows);
@@ -3749,7 +3816,7 @@ function doPost(e) {
     if (payload.dailyOtMap && typeof payload.dailyOtMap === "object") {
       var otSheet = ss.getSheetByName("Daily_OT");
       if (otSheet.getLastRow() > 1) {
-        otSheet.getRange(2, 1, otSheet.getLastRow() - 1, otSheet.getLastColumn()).clearContent();
+        otSheet.getRange(2, 1, otSheet.getLastRow() - 1, otSheet.getMaxColumns()).clearContent();
       }
       var otKeys = Object.keys(payload.dailyOtMap);
       var otRows = otKeys.map(function(k) {
@@ -3763,12 +3830,15 @@ function doPost(e) {
     return jsonResponse_({ ok: true, status: "ok", action: action });
   } catch (err) {
     return jsonResponse_({ ok: false, status: "error", error: err.toString() });
+  } finally {
+    lock.releaseLock();
   }
 }
 
 function doGet(e) {
   try {
     var ss = setupSheets_();
+    var timeZone = ss.getSpreadsheetTimeZone() || "Asia/Bangkok";
 
     // 1. อ่านรายชื่อพนักงาน (Employees)
     var empSheet = ss.getSheetByName("Employees");
@@ -3778,7 +3848,7 @@ function doGet(e) {
       employees = empData.map(function(r) {
         return {
           id: String(r[0] || "").trim(),
-          pin: String(r[1] || "").trim(),
+          pin: String(r[1] || "").replace(/^'/, "").trim(),
           name: String(r[2] || "").trim(),
           nickname: String(r[3] || "").trim(),
           myanmarName: String(r[4] || "").trim(),
@@ -3790,12 +3860,17 @@ function doGet(e) {
       }).filter(function(emp) { return emp.id !== ""; });
     }
 
-    // 2. อ่านผู้ที่กำลังพักเบรกสด (Active_Breaks)
+    // 2. อ่านผู้ที่กำลังพักเบรกสด (Active_Breaks) พร้อมเวลาเริ่มพักและเวลาครบกำหนด
     var activeSheet = ss.getSheetByName("Active_Breaks");
     var activeBreaks = [];
     if (activeSheet && activeSheet.getLastRow() > 1) {
-      var actData = activeSheet.getRange(2, 1, activeSheet.getLastRow() - 1, 9).getValues();
+      var actCols = Math.max(11, activeSheet.getLastColumn());
+      var actData = activeSheet.getRange(2, 1, activeSheet.getLastRow() - 1, actCols).getValues();
       activeBreaks = actData.map(function(r) {
+        var startMs = Number(r[7]) || Date.now();
+        var limitMins = Number(r[6] || 15);
+        var startTimeStr = r[9] ? formatCellText_(r[9], timeZone, "HH:mm:ss") : Utilities.formatDate(new Date(startMs), timeZone, "HH:mm:ss");
+        var endTimeStr = r[10] ? formatCellText_(r[10], timeZone, "HH:mm:ss") : Utilities.formatDate(new Date(startMs + limitMins * 60000), timeZone, "HH:mm:ss");
         return {
           empId: String(r[0] || "").trim(),
           empName: String(r[1] || "").trim(),
@@ -3803,9 +3878,11 @@ function doGet(e) {
           myanmarName: String(r[3] || "").trim(),
           zone: String(r[4] || "").trim(),
           breakType: String(r[5] || "cold").trim(),
-          limitMinutes: Number(r[6] || 15),
-          startTimestamp: Number(r[7] || Date.now()),
-          dateKey: String(r[8] || "").trim()
+          limitMinutes: limitMins,
+          startTimestamp: startMs,
+          dateKey: formatCellText_(r[8], timeZone, "yyyy-MM-dd"),
+          startTime: startTimeStr,
+          expectedEndTime: endTimeStr
         };
       }).filter(function(a) { return a.empId !== ""; });
     }
@@ -3814,7 +3891,7 @@ function doGet(e) {
     var logSheet = ss.getSheetByName("Break_Logs");
     var breakLogs = [];
     if (logSheet && logSheet.getLastRow() > 1) {
-      var numCols = Math.max(18, logSheet.getLastColumn());
+      var numCols = Math.max(21, logSheet.getLastColumn());
       var logData = logSheet.getRange(2, 1, logSheet.getLastRow() - 1, numCols).getValues();
       logData.forEach(function(r, idx) {
         var eventType = String(r[2] || "");
@@ -3825,21 +3902,21 @@ function doGet(e) {
         var isMeal = bTypeStr.indexOf("ข้าว") !== -1 || bTypeStr.toLowerCase() === "meal";
         var statusStr = String(r[13] || "");
         var isOver = statusStr.indexOf("OVERDUE") !== -1 || statusStr.indexOf("เกิน") !== -1;
-        var durStr = String(r[12] || "00:00");
+        var durStr = formatCellText_(r[12], timeZone, "mm:ss") || "00:00";
         var parts = durStr.split(":");
-        var parsedSec = parts.length === 2 ? (parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10)) : 900;
+        var parsedSec = parts.length >= 2 ? (parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10)) : 900;
         var actualSec = Number(r[20]) || parsedSec || 900;
 
         breakLogs.push({
           id: "LOG-GS-" + idx,
-          dateKey: String(r[0] || "").trim(),
+          dateKey: formatCellText_(r[0], timeZone, "yyyy-MM-dd"),
           empId: empId,
           empName: String(r[5] || "").trim(),
           nickname: String(r[6] || "").trim(),
           zone: String(r[7] || "").trim(),
           breakType: isMeal ? "meal" : "cold",
-          startTime: String(r[9] || "").trim(),
-          endTime: String(r[10] || "").trim(),
+          startTime: formatCellText_(r[9], timeZone, "HH:mm:ss"),
+          endTime: formatCellText_(r[10], timeZone, "HH:mm:ss"),
           limitMinutes: Number(r[11] || (isMeal ? 80 : 15)),
           durationSec: actualSec,
           durationMins: Math.round(actualSec / 60),
@@ -3875,12 +3952,32 @@ function doGet(e) {
   }
 }
 
+function formatCellText_(val, timeZone, pattern) {
+  if (val === null || val === undefined || val === "") return "";
+  if (Object.prototype.toString.call(val) === "[object Date]") {
+    return Utilities.formatDate(val, timeZone, pattern);
+  }
+  return String(val).replace(/^'/, "").trim();
+}
+
+function ensureHeaders_(sheet, headers) {
+  if (!sheet) return;
+  sheet.getRange(1, 1, 1, headers.length)
+    .setValues([headers])
+    .setFontWeight("bold")
+    .setBackground("#0284C7")
+    .setFontColor("#FFFFFF");
+}
+
 function getOrCreateSheet_(ss, sheetName, headers) {
   var sheet = ss.getSheetByName(sheetName);
   if (!sheet) {
     sheet = ss.insertSheet(sheetName);
     sheet.appendRow(headers);
-    sheet.getRange(1, 1, 1, headers.length).setFontWeight("bold").setBackground("#0284C7").setFontColor("#FFFFFF");
+    sheet.getRange(1, 1, 1, headers.length)
+      .setFontWeight("bold")
+      .setBackground("#0284C7")
+      .setFontColor("#FFFFFF");
     sheet.setFrozenRows(1);
   }
   return sheet;
@@ -3892,13 +3989,17 @@ function jsonResponse_(obj) {
     .setMimeType(ContentService.MimeType.JSON);
 }`;
 
-    // แปลงข้อมูล Active_Breaks และ Daily_OT ในแอปให้อยู่ในรูปแบบกลางที่ใช้ร่วมกับ tv.html
+    // แปลงข้อมูล Active_Breaks และ Daily_OT ในแอปให้อยู่ในรูปแบบกลางที่ใช้ร่วมกับ tv.html และ Google Sheets
     function buildLiveSyncPayload(actionName = 'LIVE_SYNC', extraData = {}) {
       const todayKey = getRelativeDateKey(0);
 
       const serializedActiveBreaks = appState.activeBreaks.map(b => {
         const emp = appState.employees.find(e => e.id === b.empId) || {};
         const isMeal = b.breakType === 'MEAL';
+        const limitMins = Math.round((b.targetDurationSec || (isMeal ? 4800 : 900)) / 60);
+        const startMs = Number(b.startTimeMs) || Date.now();
+        const expectedEndMs = startMs + (b.targetDurationSec || (limitMins * 60)) * 1000;
+
         return {
           id: b.id,
           empId: b.empId,
@@ -3907,11 +4008,13 @@ function jsonResponse_(obj) {
           myanmarName: emp.myanmarName || '',
           zone: emp.zone || 'Frozen -25°C',
           breakType: isMeal ? 'meal' : 'cold',
-          limitMinutes: Math.round((b.targetDurationSec || (isMeal ? 4800 : 900)) / 60),
-          startTimestamp: b.startTimeMs,
-          startTimeMs: b.startTimeMs,
-          targetDurationSec: b.targetDurationSec,
-          dateKey: todayKey
+          limitMinutes: limitMins,
+          startTimestamp: startMs,
+          startTimeMs: startMs,
+          targetDurationSec: b.targetDurationSec || (limitMins * 60),
+          dateKey: todayKey,
+          startTime: formatTimeClock(new Date(startMs)),
+          expectedEndTime: formatTimeClock(new Date(expectedEndMs))
         };
       });
 
@@ -3944,6 +4047,13 @@ function jsonResponse_(obj) {
           statusText: q.isOverTotalQuota ? `เกินโควตา +${Math.abs(q.remainingMin)} นาที` : 'อยู่ในโควตาปกติ'
         };
       });
+
+      // บันทึกลง LocalStorage ควบคู่กันเพื่อให้กรณีเปิด tv.html ในเครื่องเดียวกันซิงค์ทันที 0 วินาที
+      try {
+        localStorage.setItem('CR_EMPLOYEES', JSON.stringify(appState.employees));
+        localStorage.setItem('CR_ACTIVE_BREAKS', JSON.stringify(serializedActiveBreaks));
+        localStorage.setItem('CR_DAILY_OT', JSON.stringify(flatDailyOtMap));
+      } catch (err) {}
 
       return {
         action: actionName,
@@ -4036,7 +4146,7 @@ function jsonResponse_(obj) {
     }
 
     async function sendToGoogleSheet(payloadObj, showNotification = false) {
-      const url = (appState.settings.googleSheetWebAppUrl || '').trim();
+      const url = (appState.settings.googleSheetWebAppUrl || DEFAULT_GOOGLE_SCRIPT_URL || '').trim();
       if (!url) {
         if (showNotification) {
           showToast('กรุณาวางลิงก์ Google Apps Script Web App URL ก่อนใช้งาน', 'warning');
@@ -4045,6 +4155,8 @@ function jsonResponse_(obj) {
       }
 
       try {
+        isPushingToGoogleSheet = true;
+        lastGoogleSheetPushMs = Date.now();
         updateGsheetStatusText(`กำลังส่งข้อมูล (${payloadObj.action}) ไปยัง Google Sheets...`);
         // Using text/plain avoids CORS preflight (OPTIONS) block on Google Apps Script endpoints
         await fetch(url, {
@@ -4053,6 +4165,7 @@ function jsonResponse_(obj) {
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify(payloadObj)
         });
+        lastGoogleSheetPushMs = Date.now();
         updateGsheetStatusText(`ส่งข้อมูล (${payloadObj.action}) เข้า Google Sheets สำเร็จ`);
         if (showNotification) {
           showToast('✅ ส่งข้อมูลเข้า Google Sheets เรียบร้อยแล้ว!', 'success');
@@ -4065,6 +4178,8 @@ function jsonResponse_(obj) {
           showToast('เกิดข้อผิดพลาดในการส่งข้อมูลไปที่ Google Sheets กรุณาตรวจสอบ URL', 'error');
         }
         return false;
+      } finally {
+        isPushingToGoogleSheet = false;
       }
     }
 
@@ -4174,6 +4289,11 @@ function jsonResponse_(obj) {
     }
 
     async function pullDataFromGoogleSheet(silent = false) {
+      // ป้องกันการดึงข้อมูลเก่ามาทับรายการที่เพิ่งยิงสแกนเสร็จไม่เกิน 8 วินาที
+      if (silent && (isPushingToGoogleSheet || (Date.now() - lastGoogleSheetPushMs < 8000))) {
+        return;
+      }
+
       const url = (appState.settings.googleSheetWebAppUrl || DEFAULT_GOOGLE_SCRIPT_URL || '').trim();
       if (!url) {
         if (!silent) {
@@ -4191,6 +4311,18 @@ function jsonResponse_(obj) {
         const data = await res.json();
 
         if (data && (data.ok || data.status === 'ok')) {
+          const sheetIsCompletelyEmpty =
+            (!Array.isArray(data.employees) || data.employees.length === 0) &&
+            (!Array.isArray(data.activeBreaks) || data.activeBreaks.length === 0) &&
+            (!Array.isArray(data.breakLogs) || data.breakLogs.length === 0);
+
+          // หาก Google Sheet เพิ่งสร้างใหม่และยังว่างเปล่า ให้ส่งข้อมูลเริ่มต้นจากแอปขึ้นไปสร้างตารางใน Sheet อัตโนมัติ
+          if (sheetIsCompletelyEmpty && appState.employees.length > 0) {
+            await pushLiveStateToGoogleSheet('INITIAL_SEED', {}, false);
+            updateGsheetStatusText('ส่งข้อมูลชุดเริ่มต้นเข้า Google Sheets อัตโนมัติเรียบร้อยแล้ว');
+            return;
+          }
+
           // 1. ซิงค์รายชื่อพนักงาน
           if (Array.isArray(data.employees) && data.employees.length > 0) {
             appState.employees = data.employees;
@@ -4254,8 +4386,8 @@ function jsonResponse_(obj) {
             showToast(`✅ ดึงข้อมูลสดจาก Google Sheets สำเร็จ! (พนักงาน ${appState.employees.length} คน, กำลังพัก ${appState.activeBreaks.length} คน)`, 'success');
           }
         } else if (!silent) {
-          updateGsheetStatusText('เชื่อมต่อสำเร็จ (กดปุ่มส่งข้อมูลขึ้น Sheet เพื่อสร้างข้อมูลชุดแรก)');
-          showToast('เชื่อมต่อสำเร็จ! กดปุ่ม "ส่งรายชื่อพนักงานขึ้น Sheet" เพื่อเริ่มซิงค์ข้อมูลชุดแรกได้เลย', 'info');
+          updateGsheetStatusText('เชื่อมต่อสำเร็จ (กดปุ่มซิงค์ Active_Breaks ขึ้น Sheet เพื่อสร้างข้อมูล)');
+          showToast('เชื่อมต่อสำเร็จ! กดปุ่ม "ซิงค์ Active_Breaks ขึ้น Sheet" ได้เลย', 'info');
         }
       } catch (err) {
         if (!silent) {
@@ -4264,6 +4396,336 @@ function jsonResponse_(obj) {
           showToast('ไม่สามารถดึงข้อมูลได้ กรุณาตรวจสอบว่าตั้งค่า Deploy Web App เป็น "ทุกคน (Anyone)" แล้ว', 'warning');
         }
       }
+    }
+
+    function downloadAppsScriptFile() {
+      const blob = new Blob([GOOGLE_APPS_SCRIPT_TEMPLATE_CODE], { type: 'text/plain;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', 'Code.gs');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      showToast('ดาวน์โหลดไฟล์ Code.gs สำหรับนำไปวางใน Google Apps Script เรียบร้อยแล้ว', 'success');
+    }
+
+    function downloadTvHtmlFile() {
+      const configuredUrl = (appState.settings.googleSheetWebAppUrl || DEFAULT_GOOGLE_SCRIPT_URL || '').trim();
+      const tvHtmlContent = `<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TV Live Monitor - ระบบมอนิเตอร์พักเบรกหนาว (View Only)</title>
+  <script src="https://cdn.tailwindcss.com"><\/script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@600;700;800&family=Noto+Sans+Myanmar:wght@400;600;700&family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Prompt', 'Noto Sans Myanmar', sans-serif;
+      background: linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 50%, #F1F5F9 100%);
+      color: #0F172A;
+      overflow-x: hidden;
+      user-select: none;
+    }
+    .font-mono-timer { font-family: 'JetBrains Mono', monospace; }
+    @keyframes pulse-red {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.45); border-color: #DC2626; background-color: #FEF2F2; }
+      50% { box-shadow: 0 0 0 10px rgba(220, 38, 38, 0); border-color: #EF4444; background-color: #FEE2E2; }
+    }
+    @keyframes pulse-amber {
+      0%, 100% { border-color: #F59E0B; background-color: #FFFBEB; }
+      50% { border-color: #D97706; background-color: #FEF3C7; }
+    }
+    .card-overdue { animation: pulse-red 1.4s infinite; }
+    .card-warning { animation: pulse-amber 2s infinite; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #F1F5F9; }
+    ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 9999px; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between p-4 lg:p-6">
+  <header class="bg-white/95 backdrop-blur-md border border-slate-200 rounded-2xl shadow-sm px-6 py-3.5 mb-4 flex flex-wrap items-center justify-between gap-4">
+    <div class="flex items-center gap-4">
+      <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-sky-500 to-blue-700 flex items-center justify-center text-white shadow-md shadow-sky-200 text-2xl">❄️</div>
+      <div>
+        <div class="flex items-center gap-2.5">
+          <span class="px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider bg-sky-100 text-sky-800 rounded-full border border-sky-200">TV MONITOR ONLY • โหมดดูอย่างเดียว</span>
+          <span id="syncBadge" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-semibold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+            <span id="syncStatusText">เชื่อมต่อข้อมูลสด</span>
+          </span>
+        </div>
+        <h1 class="text-xl lg:text-2xl font-extrabold text-slate-900 tracking-tight mt-0.5">กระดานติดตามเวลาพักเบรกห้องเย็น (Cold Room Break Live Monitor)</h1>
+      </div>
+    </div>
+    <div class="flex items-center gap-5">
+      <div class="text-right">
+        <div id="tvDateText" class="text-xs font-semibold text-slate-500">กำลังโหลดวันที่...</div>
+        <div id="tvClockText" class="text-3xl lg:text-4xl font-extrabold font-mono-timer text-slate-900 tracking-tight">00:00:00</div>
+      </div>
+      <div class="flex items-center gap-2 border-l border-slate-200 pl-4">
+        <button onclick="toggleSound()" class="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-semibold flex items-center gap-1.5 transition">
+          <span id="soundIcon">🔔</span><span id="soundLabel" class="hidden sm:inline">เสียงเตือน: เปิด</span>
+        </button>
+        <button onclick="toggleFullScreen()" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm transition">
+          <span>⛶</span><span class="hidden sm:inline">เต็มจอ TV</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <section class="grid grid-cols-2 lg:grid-cols-5 gap-3.5 mb-4">
+    <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex items-center justify-between">
+      <div><p class="text-xs font-bold text-slate-500 uppercase">กำลังพักทั้งหมด</p><p class="text-xs text-slate-400">လက်ရှိနားနေသူ</p><p id="kpiTotalActive" class="text-4xl font-extrabold text-slate-900 font-mono-timer mt-1">0</p></div>
+      <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-700 flex items-center justify-center text-2xl font-bold">👥</div>
+    </div>
+    <div class="bg-white border border-sky-200 rounded-2xl p-4 shadow-sm flex items-center justify-between">
+      <div><p class="text-xs font-bold text-sky-700 uppercase">สถานะปกติ</p><p class="text-xs text-sky-500">ပုံမှန်အချိန်</p><p id="kpiNormal" class="text-4xl font-extrabold text-sky-600 font-mono-timer mt-1">0</p></div>
+      <div class="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center text-2xl font-bold">❄️</div>
+    </div>
+    <div class="bg-white border border-amber-300 rounded-2xl p-4 shadow-sm flex items-center justify-between">
+      <div><p class="text-xs font-bold text-amber-700 uppercase">ใกล้หมดเวลา (&lt; 2 นาที)</p><p class="text-xs text-amber-600">အချိန်ပြည့်ခါနီး</p><p id="kpiWarning" class="text-4xl font-extrabold text-amber-600 font-mono-timer mt-1">0</p></div>
+      <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-2xl font-bold">⏳</div>
+    </div>
+    <div class="bg-white border-2 border-red-300 rounded-2xl p-4 shadow-sm flex items-center justify-between">
+      <div><p class="text-xs font-bold text-red-700 uppercase">เกินเวลาพัก!</p><p class="text-xs text-red-500">အချိန်ကျော်လွန်</p><p id="kpiOverdue" class="text-4xl font-extrabold text-red-600 font-mono-timer mt-1">0</p></div>
+      <div class="w-12 h-12 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center text-2xl font-bold">🚨</div>
+    </div>
+    <div class="col-span-2 lg:col-span-1 bg-white border border-emerald-200 rounded-2xl p-4 shadow-sm flex items-center justify-between">
+      <div><p class="text-xs font-bold text-emerald-700 uppercase">พักเสร็จวันนี้ / ตรงเวลา</p><p class="text-xs text-emerald-600">วันนี้รวมทุกรอบ</p><div class="flex items-baseline gap-2 mt-1"><span id="kpiCompletedToday" class="text-3xl font-extrabold text-emerald-600 font-mono-timer">0</span><span id="kpiOnTimeRate" class="text-sm font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">100%</span></div></div>
+      <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl font-bold">✅</div>
+    </div>
+  </section>
+
+  <main class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+    <section class="lg:col-span-7 bg-white/95 border border-slate-200 rounded-2xl shadow-sm p-5 flex flex-col">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+        <div class="flex items-center gap-2.5"><span class="w-3 h-3 rounded-full bg-sky-500 animate-pulse"></span><h2 class="text-lg lg:text-xl font-extrabold text-slate-900">รายชื่อพนักงานที่กำลังพักเบรกขณะนี้ (Live Countdown)</h2></div>
+        <span class="text-xs font-semibold text-slate-500">เรียงลำดับ: เกินเวลา &rarr; ใกล้หมดเวลา &rarr; ปกติ</span>
+      </div>
+      <div id="activeBreakContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 content-start"></div>
+    </section>
+
+    <section class="lg:col-span-5 flex flex-col gap-4">
+      <div class="bg-white/95 border border-slate-200 rounded-2xl shadow-sm p-5 flex-1 flex flex-col">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
+          <div><h2 class="text-base lg:text-lg font-extrabold text-slate-900">📊 สรุปโควตาพักเบรกรายบุคคลวันนี้</h2><p class="text-xs text-slate-500">เกณฑ์กะ 8 ชม.: เบรกหนาว 120 นาที (15น.×8) + ทานข้าว 80 นาที = 200 นาที (OT +15น./ชม.)</p></div>
+          <span id="quotaSummaryCount" class="text-xs font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700">0 คน</span>
+        </div>
+        <div class="overflow-y-auto max-h-[360px] pr-1">
+          <table class="w-full text-left border-collapse">
+            <thead><tr class="border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase"><th class="py-2 px-2">พนักงาน</th><th class="py-2 px-2 text-center">เบรกหนาว</th><th class="py-2 px-2 text-center">ทานข้าว</th><th class="py-2 px-2 text-center">รวมวันนี้ / โควตา</th><th class="py-2 px-2 text-right">สถานะ</th></tr></thead>
+            <tbody id="tvQuotaTableBody" class="divide-y divide-slate-100 text-xs"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="bg-white/95 border border-slate-200 rounded-2xl shadow-sm p-4">
+        <div class="flex items-center justify-between mb-2"><h3 class="text-sm font-extrabold text-slate-800">⏱️ สแกนกลับเข้าห้องเย็นล่าสุด (Recent Returns)</h3><span id="lastPullTimeText" class="text-[11px] text-slate-400">อัปเดตล่าสุด: --:--:--</span></div>
+        <div id="recentLogsList" class="space-y-1.5 max-h-[150px] overflow-y-auto"></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const DEFAULT_GOOGLE_SCRIPT_URL = "${configuredUrl}";
+    const AUTO_REFRESH_INTERVAL_MS = 10000;
+    let scriptUrl = localStorage.getItem('CR_GS_URL') || DEFAULT_GOOGLE_SCRIPT_URL;
+    let soundEnabled = true;
+    let alertedOverdueIds = new Set();
+    let employees = [];
+    let activeBreaks = [];
+    let breakLogs = [];
+    let dailyOtMap = {};
+
+    function getTodayDateKey() {
+      const now = new Date();
+      return now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+    }
+
+    function loadFromLocalStorage() {
+      try {
+        const rawEmp = localStorage.getItem('CR_EMPLOYEES');
+        const rawAct = localStorage.getItem('CR_ACTIVE_BREAKS');
+        const rawOt = localStorage.getItem('CR_DAILY_OT');
+        if (rawEmp) employees = JSON.parse(rawEmp);
+        if (rawAct) activeBreaks = JSON.parse(rawAct);
+        if (rawOt) dailyOtMap = JSON.parse(rawOt);
+      } catch (e) {}
+    }
+
+    async function pullFromGoogleSheets() {
+      const statusText = document.getElementById('syncStatusText');
+      if (!scriptUrl || !scriptUrl.includes('/exec')) {
+        loadFromLocalStorage();
+        renderTVScreen();
+        return;
+      }
+      try {
+        statusText.textContent = 'กำลังซิงค์ข้อมูลสด...';
+        const res = await fetch(scriptUrl + '?action=getAll&t=' + Date.now());
+        const data = await res.json();
+        if (data && (data.ok || data.status === 'ok')) {
+          if (Array.isArray(data.employees) && data.employees.length > 0) employees = data.employees;
+          if (Array.isArray(data.activeBreaks)) activeBreaks = data.activeBreaks;
+          if (Array.isArray(data.breakLogs)) breakLogs = data.breakLogs;
+          if (data.dailyOtMap) dailyOtMap = data.dailyOtMap;
+          document.getElementById('lastPullTimeText').textContent = 'อัปเดตจาก Cloud: ' + new Date().toLocaleTimeString('th-TH', { hour12: false });
+          statusText.textContent = 'เชื่อมต่อ Google Sheets สด (อัปเดตทุก 10 วิ)';
+          renderTVScreen();
+        }
+      } catch (err) {
+        loadFromLocalStorage();
+        renderTVScreen();
+      }
+    }
+
+    function calculateEmployeeQuotaToday(emp) {
+      const todayKey = getTodayDateKey();
+      const otKey = todayKey + '_' + emp.id;
+      const otHours = (dailyOtMap[otKey] !== undefined) ? Number(dailyOtMap[otKey]) : (Number(emp.otHours) || 0);
+      const coldQuotaMins = 120 + (otHours * 15);
+      const mealQuotaMins = 80;
+      const totalQuotaMins = coldQuotaMins + mealQuotaMins;
+      let coldUsedSec = 0, mealUsedSec = 0;
+
+      breakLogs.forEach(log => {
+        if (log.empId === emp.id && (log.dateKey || todayKey) === todayKey) {
+          const sec = Number(log.durationSec) || ((Number(log.durationMins) || 0) * 60);
+          if (String(log.breakType).toLowerCase() === 'meal') mealUsedSec += sec;
+          else coldUsedSec += sec;
+        }
+      });
+
+      const active = activeBreaks.find(a => a.empId === emp.id);
+      if (active) {
+        const elapsedSec = Math.max(0, Math.floor((Date.now() - Number(active.startTimestamp || active.startTimeMs)) / 1000));
+        if (String(active.breakType).toLowerCase() === 'meal') mealUsedSec += elapsedSec;
+        else coldUsedSec += elapsedSec;
+      }
+
+      const coldUsedMins = Math.round(coldUsedSec / 60);
+      const mealUsedMins = Math.round(mealUsedSec / 60);
+      const totalUsedMins = coldUsedMins + mealUsedMins;
+      return { otHours, coldQuotaMins, mealQuotaMins, totalQuotaMins, coldUsedMins, mealUsedMins, totalUsedMins, remainingMins: totalQuotaMins - totalUsedMins, isOverQuota: totalUsedMins > totalQuotaMins };
+    }
+
+    function formatMMSS(totalSeconds) {
+      const absSec = Math.abs(Math.floor(totalSeconds));
+      return String(Math.floor(absSec / 60)).padStart(2, '0') + ':' + String(absSec % 60).padStart(2, '0');
+    }
+
+    function renderTVScreen() {
+      const now = Date.now();
+      const todayKey = getTodayDateKey();
+      let normalCount = 0, warningCount = 0, overdueCount = 0;
+
+      const enrichedActive = activeBreaks.map(item => {
+        const emp = employees.find(e => e.id === item.empId) || { id: item.empId, name: item.empName || item.empId, nickname: item.nickname || '', myanmarName: item.myanmarName || '', zone: item.zone || 'Frozen -25°C' };
+        const isMeal = String(item.breakType).toLowerCase() === 'meal';
+        const limitMinutes = Number(item.limitMinutes) || (isMeal ? 80 : 15);
+        const startMs = Number(item.startTimestamp || item.startTimeMs) || now;
+        const elapsedSec = Math.max(0, Math.floor((now - startMs) / 1000));
+        const remainSec = (limitMinutes * 60) - elapsedSec;
+        let status = 'normal';
+        if (remainSec < 0) { status = 'overdue'; overdueCount++; }
+        else if (remainSec <= 120) { status = 'warning'; warningCount++; }
+        else { normalCount++; }
+        return { ...item, emp, isMeal, limitMinutes, startMs, remainSec, status };
+      });
+
+      const rank = { overdue: 0, warning: 1, normal: 2 };
+      enrichedActive.sort((a, b) => rank[a.status] - rank[b.status] || a.remainSec - b.remainSec);
+
+      document.getElementById('kpiTotalActive').textContent = enrichedActive.length;
+      document.getElementById('kpiNormal').textContent = normalCount;
+      document.getElementById('kpiWarning').textContent = warningCount;
+      document.getElementById('kpiOverdue').textContent = overdueCount;
+
+      const todayLogs = breakLogs.filter(l => (l.dateKey || todayKey) === todayKey);
+      const onTimeLogs = todayLogs.filter(l => !l.isOvertime).length;
+      const onTimeRate = todayLogs.length > 0 ? Math.round((onTimeLogs / todayLogs.length) * 100) : 100;
+      document.getElementById('kpiCompletedToday').textContent = todayLogs.length + ' รอบ';
+      document.getElementById('kpiOnTimeRate').textContent = 'ตรงเวลา ' + onTimeRate + '%';
+
+      const container = document.getElementById('activeBreakContainer');
+      if (enrichedActive.length === 0) {
+        container.innerHTML = '<div class="col-span-full flex flex-col items-center justify-center py-20 text-center border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50/60"><div class="text-5xl mb-3">❄️</div><p class="text-xl font-extrabold text-slate-700">ขณะนี้ไม่มีพนักงานกำลังพักเบรก</p><p class="text-sm text-slate-500 mt-1">พนักงานทั้งหมดปฏิบัติงานอยู่ในโซนห้องเย็น</p></div>';
+      } else {
+        container.innerHTML = enrichedActive.map(item => {
+          const quota = calculateEmployeeQuotaToday(item.emp);
+          const badgeType = item.isMeal
+            ? '<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-orange-100 text-orange-800 border border-orange-200">🍱 พักทานข้าว (' + item.limitMinutes + ' น.)</span>'
+            : '<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-sky-100 text-sky-800 border border-sky-200">❄️ เบรกหนาว (' + item.limitMinutes + ' น.)</span>';
+          let cardClass = 'bg-white border-2 border-sky-200', timerColor = 'text-sky-600', statusPill = '<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-sky-100 text-sky-800">ปกติ</span>';
+          if (item.status === 'overdue') { cardClass = 'card-overdue border-2'; timerColor = 'text-red-600'; statusPill = '<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-600 text-white">🚨 เกินเวลา!</span>'; }
+          else if (item.status === 'warning') { cardClass = 'card-warning border-2'; timerColor = 'text-amber-600'; statusPill = '<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500 text-white">⏳ ใกล้หมดเวลา</span>'; }
+          const timerText = item.remainSec < 0 ? ('+' + formatMMSS(item.remainSec)) : formatMMSS(item.remainSec);
+          const startTimeText = item.startTime || new Date(item.startMs).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+          const endTimeText = item.expectedEndTime || new Date(item.startMs + item.limitMinutes * 60000).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+          return '<div class="' + cardClass + ' rounded-2xl p-4 shadow-sm flex flex-col justify-between transition">' +
+            '<div class="flex items-start justify-between gap-2"><div><div class="flex items-center gap-2"><span class="text-xs font-mono-timer font-bold px-2 py-0.5 rounded bg-slate-900 text-white">' + item.emp.id + '</span>' + badgeType + '</div>' +
+            '<h3 class="text-xl font-extrabold text-slate-900 mt-1.5">' + item.emp.name + ' (' + item.emp.nickname + ')</h3>' +
+            '<p class="text-xs text-slate-500">โซน: <strong class="text-slate-700">' + item.emp.zone + '</strong></p></div>' + statusPill + '</div>' +
+            '<div class="my-3 py-2.5 px-4 rounded-xl bg-white/80 border border-slate-200/80 flex items-center justify-between">' +
+            '<div><p class="text-[11px] font-bold text-slate-400 uppercase">' + (item.remainSec < 0 ? 'เวลาที่เกินกำหนด' : 'เวลาคงเหลือ') + '</p>' +
+            '<p class="text-xs text-slate-600 font-semibold">เริ่มพัก: ' + startTimeText + ' น. | ครบกำหนด: ' + endTimeText + ' น.</p></div>' +
+            '<div class="text-4xl font-extrabold font-mono-timer ' + timerColor + ' tracking-tight">' + timerText + '</div></div>' +
+            '<div class="flex items-center justify-between text-xs text-slate-600 pt-1 border-t border-slate-200/60">' +
+            '<span>โควตาสะสมวันนี้: <strong>' + quota.totalUsedMins + ' / ' + quota.totalQuotaMins + ' นาที</strong></span>' +
+            '<span class="' + (quota.isOverQuota ? 'text-red-600 font-bold' : 'text-emerald-700 font-semibold') + '">' +
+            (quota.isOverQuota ? ('เกินโควตา +' + Math.abs(quota.remainingMins) + ' น.') : ('เหลือ ' + quota.remainingMins + ' น.')) + '</span></div></div>';
+        }).join('');
+      }
+
+      document.getElementById('quotaSummaryCount').textContent = employees.length + ' คน';
+      document.getElementById('tvQuotaTableBody').innerHTML = employees.map(emp => {
+        const q = calculateEmployeeQuotaToday(emp);
+        return '<tr class="hover:bg-slate-50"><td class="py-2.5 px-2"><div class="font-bold text-slate-900">' + emp.name + ' (' + emp.nickname + ')</div><div class="text-[11px] text-slate-400">' + emp.id + ' • ' + emp.zone + '</div></td>' +
+          '<td class="py-2.5 px-2 text-center font-mono-timer font-semibold text-sky-700">' + q.coldUsedMins + '/' + q.coldQuotaMins + 'น.</td>' +
+          '<td class="py-2.5 px-2 text-center font-mono-timer font-semibold text-orange-700">' + q.mealUsedMins + '/' + q.mealQuotaMins + 'น.</td>' +
+          '<td class="py-2.5 px-2 text-center font-mono-timer font-bold text-slate-900">' + q.totalUsedMins + ' / ' + q.totalQuotaMins + ' น.</td>' +
+          '<td class="py-2.5 px-2 text-right">' + (q.isOverQuota ? ('<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-red-100 text-red-700">เกิน +' + Math.abs(q.remainingMins) + 'น.</span>') : ('<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-700">เหลือ ' + q.remainingMins + 'น.</span>')) + '</td></tr>';
+      }).join('');
+
+      const recentFive = [...todayLogs].slice(-5).reverse();
+      document.getElementById('recentLogsList').innerHTML = recentFive.length === 0
+        ? '<p class="text-xs text-slate-400 py-3 text-center">ยังไม่มีประวัติการสแกนกลับเข้าห้องเย็นในวันนี้</p>'
+        : recentFive.map(log => '<div class="flex items-center justify-between px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-100 text-xs"><div class="flex items-center gap-2"><span class="font-mono-timer font-bold text-slate-700">' + log.empId + '</span><span class="font-bold text-slate-900">' + (log.empName || '') + '</span></div><div class="flex items-center gap-2"><span class="font-mono-timer font-semibold text-slate-700">ใช้ไป ' + (log.durationMins || Math.round((log.durationSec || 0)/60)) + ' นาที</span></div></div>').join('');
+    }
+
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('tvClockText').textContent = now.toLocaleTimeString('th-TH', { hour12: false });
+      document.getElementById('tvDateText').textContent = now.toLocaleDateString('th-TH', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    }
+    function toggleSound() { soundEnabled = !soundEnabled; document.getElementById('soundIcon').textContent = soundEnabled ? '🔔' : '🔕'; }
+    function toggleFullScreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {}); else document.exitFullscreen(); }
+
+    window.addEventListener('storage', () => { loadFromLocalStorage(); renderTVScreen(); });
+    window.addEventListener('DOMContentLoaded', () => {
+      loadFromLocalStorage();
+      updateClock();
+      renderTVScreen();
+      pullFromGoogleSheets();
+      setInterval(() => { updateClock(); renderTVScreen(); }, 1000);
+      setInterval(() => { pullFromGoogleSheets(); }, AUTO_REFRESH_INTERVAL_MS);
+    });
+  <\/script>
+</body>
+</html>`;
+
+      const blob = new Blob([tvHtmlContent], { type: 'text/html;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', 'tv.html');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      showToast('📺 ดาวน์โหลดไฟล์ tv.html (ฝังลิงก์ Google Sheets ของคุณเรียบร้อยแล้ว) สำเร็จ!', 'success');
     }
 
     function toggleAppsScriptGuideModal() {
@@ -5271,6 +5733,8 @@ function jsonResponse_(obj) {
       pullDataFromGoogleSheet,
       toggleAppsScriptGuideModal,
       copyAppsScriptCode,
+      downloadAppsScriptFile,
+      downloadTvHtmlFile,
       openResetDemoModal,
       openClearHistoryModal,
       closeConfirmModal,
