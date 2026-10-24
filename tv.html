@@ -14,9 +14,7 @@
       overflow-x: hidden;
       user-select: none;
     }
-    .font-mono-timer {
-      font-family: 'JetBrains Mono', monospace;
-    }
+    .font-mono-timer { font-family: 'JetBrains Mono', monospace; }
     @keyframes pulse-red {
       0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.45); border-color: #DC2626; background-color: #FEF2F2; }
       50% { box-shadow: 0 0 0 10px rgba(220, 38, 38, 0); border-color: #EF4444; background-color: #FEE2E2; }
@@ -25,424 +23,206 @@
       0%, 100% { border-color: #F59E0B; background-color: #FFFBEB; }
       50% { border-color: #D97706; background-color: #FEF3C7; }
     }
-    .card-overdue {
-      animation: pulse-red 1.4s infinite;
-    }
-    .card-warning {
-      animation: pulse-amber 2s infinite;
-    }
-    /* Custom Scrollbar for TV Tables */
+    .card-overdue { animation: pulse-red 1.4s infinite; }
+    .card-warning { animation: pulse-amber 2s infinite; }
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #F1F5F9; }
     ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 9999px; }
   </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between p-4 lg:p-6">
-
-  <!-- ================= TOP HEADER BAR (TV VIEW ONLY) ================= -->
   <header class="bg-white/95 backdrop-blur-md border border-slate-200 rounded-2xl shadow-sm px-6 py-3.5 mb-4 flex flex-wrap items-center justify-between gap-4">
     <div class="flex items-center gap-4">
-      <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-sky-500 to-blue-700 flex items-center justify-center text-white shadow-md shadow-sky-200">
-        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-        </svg>
-      </div>
+      <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-sky-500 to-blue-700 flex items-center justify-center text-white shadow-md shadow-sky-200 text-2xl">❄️</div>
       <div>
         <div class="flex items-center gap-2.5">
-          <span class="px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider bg-sky-100 text-sky-800 rounded-full border border-sky-200">
-            TV MONITOR ONLY • โหมดดูอย่างเดียว
-          </span>
+          <span class="px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider bg-sky-100 text-sky-800 rounded-full border border-sky-200">TV MONITOR ONLY • โหมดดูอย่างเดียว</span>
           <span id="syncBadge" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-semibold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
             <span id="syncStatusText">เชื่อมต่อข้อมูลสด</span>
           </span>
         </div>
-        <h1 class="text-xl lg:text-2xl font-extrabold text-slate-900 tracking-tight mt-0.5">
-          กระดานติดตามเวลาพักเบรกห้องเย็น (Cold Room Break Live Monitor)
-        </h1>
+        <h1 class="text-xl lg:text-2xl font-extrabold text-slate-900 tracking-tight mt-0.5">กระดานติดตามเวลาพักเบรกห้องเย็น (Cold Room Break Live Monitor)</h1>
       </div>
     </div>
-
-    <!-- Right Clock & Controls -->
     <div class="flex items-center gap-5">
       <div class="text-right">
-        <div id="tvDateText" class="text-xs font-semibold text-slate-500">วันเสาร์ที่ 24 ตุลาคม 2569</div>
+        <div id="tvDateText" class="text-xs font-semibold text-slate-500">กำลังโหลดวันที่...</div>
         <div id="tvClockText" class="text-3xl lg:text-4xl font-extrabold font-mono-timer text-slate-900 tracking-tight">00:00:00</div>
       </div>
-
       <div class="flex items-center gap-2 border-l border-slate-200 pl-4">
-        <button onclick="toggleSound()" id="btnSound" title="เปิด/ปิดเสียงเตือนบนทีวี"
-          class="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-semibold flex items-center gap-1.5 transition">
-          <span id="soundIcon">🔔</span>
-          <span id="soundLabel" class="hidden sm:inline">เสียงเตือน: เปิด</span>
+        <button onclick="toggleSound()" class="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-semibold flex items-center gap-1.5 transition">
+          <span id="soundIcon">🔔</span><span id="soundLabel" class="hidden sm:inline">เสียงเตือน: เปิด</span>
         </button>
-
-        <button onclick="openUrlConfigModal()" title="ตั้งค่าลิงก์ Google Sheets"
-          class="p-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-600 transition">
-          ⚙️
-        </button>
-
-        <button onclick="toggleFullScreen()"
-          class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm transition">
-          <span>⛶</span>
-          <span class="hidden sm:inline">เต็มจอ TV</span>
+        <button onclick="toggleFullScreen()" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm transition">
+          <span>⛶</span><span class="hidden sm:inline">เต็มจอ TV</span>
         </button>
       </div>
     </div>
   </header>
 
-  <!-- ================= 5 KPI SUMMARY CARDS ================= -->
   <section class="grid grid-cols-2 lg:grid-cols-5 gap-3.5 mb-4">
     <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex items-center justify-between">
-      <div>
-        <p class="text-xs font-bold text-slate-500 uppercase">กำลังพักทั้งหมด</p>
-        <p class="text-xs text-slate-400">လက်ရှိနားနေသူ</p>
-        <p id="kpiTotalActive" class="text-4xl font-extrabold text-slate-900 font-mono-timer mt-1">0</p>
-      </div>
+      <div><p class="text-xs font-bold text-slate-500 uppercase">กำลังพักทั้งหมด</p><p class="text-xs text-slate-400">လက်ရှိနားနေသူ</p><p id="kpiTotalActive" class="text-4xl font-extrabold text-slate-900 font-mono-timer mt-1">0</p></div>
       <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-700 flex items-center justify-center text-2xl font-bold">👥</div>
     </div>
-
     <div class="bg-white border border-sky-200 rounded-2xl p-4 shadow-sm flex items-center justify-between">
-      <div>
-        <p class="text-xs font-bold text-sky-700 uppercase">สถานะปกติ</p>
-        <p class="text-xs text-sky-500">ပုံမှန်အချိန်</p>
-        <p id="kpiNormal" class="text-4xl font-extrabold text-sky-600 font-mono-timer mt-1">0</p>
-      </div>
+      <div><p class="text-xs font-bold text-sky-700 uppercase">สถานะปกติ</p><p class="text-xs text-sky-500">ပုံမှန်အချိန်</p><p id="kpiNormal" class="text-4xl font-extrabold text-sky-600 font-mono-timer mt-1">0</p></div>
       <div class="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center text-2xl font-bold">❄️</div>
     </div>
-
     <div class="bg-white border border-amber-300 rounded-2xl p-4 shadow-sm flex items-center justify-between">
-      <div>
-        <p class="text-xs font-bold text-amber-700 uppercase">ใกล้หมดเวลา (&lt; 2 นาที)</p>
-        <p class="text-xs text-amber-600">အချိန်ပြည့်ခါနီး</p>
-        <p id="kpiWarning" class="text-4xl font-extrabold text-amber-600 font-mono-timer mt-1">0</p>
-      </div>
+      <div><p class="text-xs font-bold text-amber-700 uppercase">ใกล้หมดเวลา (&lt; 2 นาที)</p><p class="text-xs text-amber-600">အချိန်ပြည့်ခါနီး</p><p id="kpiWarning" class="text-4xl font-extrabold text-amber-600 font-mono-timer mt-1">0</p></div>
       <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-2xl font-bold">⏳</div>
     </div>
-
     <div class="bg-white border-2 border-red-300 rounded-2xl p-4 shadow-sm flex items-center justify-between">
-      <div>
-        <p class="text-xs font-bold text-red-700 uppercase">เกินเวลาพัก!</p>
-        <p class="text-xs text-red-500">အချိန်ကျော်လွန်</p>
-        <p id="kpiOverdue" class="text-4xl font-extrabold text-red-600 font-mono-timer mt-1">0</p>
-      </div>
+      <div><p class="text-xs font-bold text-red-700 uppercase">เกินเวลาพัก!</p><p class="text-xs text-red-500">အချိန်ကျော်လွန်</p><p id="kpiOverdue" class="text-4xl font-extrabold text-red-600 font-mono-timer mt-1">0</p></div>
       <div class="w-12 h-12 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center text-2xl font-bold">🚨</div>
     </div>
-
     <div class="col-span-2 lg:col-span-1 bg-white border border-emerald-200 rounded-2xl p-4 shadow-sm flex items-center justify-between">
-      <div>
-        <p class="text-xs font-bold text-emerald-700 uppercase">พักเสร็จวันนี้ / ตรงเวลา</p>
-        <p class="text-xs text-emerald-600">วันนี้รวมทุกรอบ</p>
-        <div class="flex items-baseline gap-2 mt-1">
-          <span id="kpiCompletedToday" class="text-3xl font-extrabold text-emerald-600 font-mono-timer">0</span>
-          <span id="kpiOnTimeRate" class="text-sm font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">100%</span>
-        </div>
-      </div>
+      <div><p class="text-xs font-bold text-emerald-700 uppercase">พักเสร็จวันนี้ / ตรงเวลา</p><p class="text-xs text-emerald-600">วันนี้รวมทุกรอบ</p><div class="flex items-baseline gap-2 mt-1"><span id="kpiCompletedToday" class="text-3xl font-extrabold text-emerald-600 font-mono-timer">0</span><span id="kpiOnTimeRate" class="text-sm font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">100%</span></div></div>
       <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl font-bold">✅</div>
     </div>
   </section>
 
-  <!-- ================= MAIN TV SPLIT BOARD ================= -->
   <main class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
-
-    <!-- LEFT 7 COLS: ACTIVE BREAK COUNTDOWN CARDS -->
     <section class="lg:col-span-7 bg-white/95 border border-slate-200 rounded-2xl shadow-sm p-5 flex flex-col">
       <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
-        <div class="flex items-center gap-2.5">
-          <span class="w-3 h-3 rounded-full bg-sky-500 animate-pulse"></span>
-          <h2 class="text-lg lg:text-xl font-extrabold text-slate-900">
-            รายชื่อพนักงานที่กำลังพักเบรกขณะนี้ (Live Countdown)
-          </h2>
-        </div>
-        <span class="text-xs font-semibold text-slate-500">
-          เรียงลำดับ: เกินเวลา → ใกล้หมดเวลา → ปกติ
-        </span>
+        <div class="flex items-center gap-2.5"><span class="w-3 h-3 rounded-full bg-sky-500 animate-pulse"></span><h2 class="text-lg lg:text-xl font-extrabold text-slate-900">รายชื่อพนักงานที่กำลังพักเบรกขณะนี้ (Live Countdown)</h2></div>
+        <span class="text-xs font-semibold text-slate-500">เรียงลำดับ: เกินเวลา &rarr; ใกล้หมดเวลา &rarr; ปกติ</span>
       </div>
-
-      <div id="activeBreakContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 content-start">
-        <!-- Rendered by JS -->
-      </div>
+      <div id="activeBreakContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 content-start"></div>
     </section>
 
-    <!-- RIGHT 5 COLS: DAILY QUOTA MONITOR & RECENT RETURN LOGS -->
     <section class="lg:col-span-5 flex flex-col gap-4">
-
-      <!-- Daily Quota Summary Table -->
       <div class="bg-white/95 border border-slate-200 rounded-2xl shadow-sm p-5 flex-1 flex flex-col">
         <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
-          <div>
-            <h2 class="text-base lg:text-lg font-extrabold text-slate-900">
-              📊 สรุปโควตาพักเบรกรายบุคคลวันนี้
-            </h2>
-            <p class="text-xs text-slate-500">
-              เกณฑ์กะ 8 ชม.: เบรกหนาว 120 นาที (15น.×8) + ทานข้าว 80 นาที = 200 นาที (OT +15น./ชม.)
-            </p>
-          </div>
-          <span id="quotaSummaryCount" class="text-xs font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700">
-            0 คน
-          </span>
+          <div><h2 class="text-base lg:text-lg font-extrabold text-slate-900">📊 สรุปโควตาพักเบรกรายบุคคลวันนี้</h2><p class="text-xs text-slate-500">เกณฑ์กะ 8 ชม.: เบรกหนาว 120 นาที (15น.×8) + ทานข้าว 80 นาที = 200 นาที (OT +15น./ชม.)</p></div>
+          <span id="quotaSummaryCount" class="text-xs font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700">0 คน</span>
         </div>
-
         <div class="overflow-y-auto max-h-[360px] pr-1">
           <table class="w-full text-left border-collapse">
-            <thead>
-              <tr class="border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase">
-                <th class="py-2 px-2">พนักงาน</th>
-                <th class="py-2 px-2 text-center">เบรกหนาว</th>
-                <th class="py-2 px-2 text-center">ทานข้าว</th>
-                <th class="py-2 px-2 text-center">รวมวันนี้ / โควตา</th>
-                <th class="py-2 px-2 text-right">สถานะ</th>
-              </tr>
-            </thead>
-            <tbody id="tvQuotaTableBody" class="divide-y divide-slate-100 text-xs">
-              <!-- Rendered by JS -->
-            </tbody>
+            <thead><tr class="border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase"><th class="py-2 px-2">พนักงาน</th><th class="py-2 px-2 text-center">เบรกหนาว</th><th class="py-2 px-2 text-center">ทานข้าว</th><th class="py-2 px-2 text-center">รวมวันนี้ / โควตา</th><th class="py-2 px-2 text-right">สถานะ</th></tr></thead>
+            <tbody id="tvQuotaTableBody" class="divide-y divide-slate-100 text-xs"></tbody>
           </table>
         </div>
       </div>
-
-      <!-- Recent Completed Scans Feed -->
       <div class="bg-white/95 border border-slate-200 rounded-2xl shadow-sm p-4">
-        <div class="flex items-center justify-between mb-2">
-          <h3 class="text-sm font-extrabold text-slate-800 flex items-center gap-1.5">
-            <span>⏱️</span> สแกนกลับเข้าห้องเย็นล่าสุด (Recent Returns)
-          </h3>
-          <span id="lastPullTimeText" class="text-[11px] text-slate-400">อัปเดตล่าสุด: --:--:--</span>
-        </div>
-        <div id="recentLogsList" class="space-y-1.5 max-h-[150px] overflow-y-auto">
-          <!-- Rendered by JS -->
-        </div>
+        <div class="flex items-center justify-between mb-2"><h3 class="text-sm font-extrabold text-slate-800">⏱️ สแกนกลับเข้าห้องเย็นล่าสุด (Recent Returns)</h3><span id="lastPullTimeText" class="text-[11px] text-slate-400">อัปเดตล่าสุด: --:--:--</span></div>
+        <div id="recentLogsList" class="space-y-1.5 max-h-[150px] overflow-y-auto"></div>
       </div>
-
     </section>
   </main>
 
-  <!-- ================= MODAL: CONFIGURE GOOGLE SHEETS URL ================= -->
-  <div id="urlModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl border border-slate-200">
-      <h3 class="text-lg font-extrabold text-slate-900 mb-1">⚙️ ตั้งค่าลิงก์ฐานข้อมูล Google Sheets (สำหรับจอ TV)</h3>
-      <p class="text-xs text-slate-500 mb-4">
-        วางลิงก์ Web App URL (<code class="bg-slate-100 px-1 rounded">https://script.google.com/macros/s/.../exec</code>) ตัวเดียวกับหน้าจุดสแกน เพื่อให้จอทีวีดึงข้อมูลอัตโนมัติทุก 10 วินาที
-      </p>
-      <input id="inputScriptUrl" type="url" placeholder="https://script.google.com/macros/s/.../exec"
-        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 mb-4" />
-      <div class="flex justify-end gap-2">
-        <button onclick="closeUrlConfigModal()" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold">ยกเลิก</button>
-        <button onclick="saveScriptUrl()" class="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold">บันทึกและดึงข้อมูลทันที</button>
-      </div>
-    </div>
-  </div>
-
   <script>
-    // =========================================================================
-    // 1. ใส่ลิงก์ Google Apps Script Web App URL (/exec) ของคุณตรงนี้
-    // =========================================================================
-    const DEFAULT_GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyGuyvxYWTRATeoGSZm5KZVYRol9pXDUCTmahPj6MM0m6Di3Fq4p-wy3UFEILHsvillZA/exec"; 
-
-    // ตั้งค่าความถี่ในการดึงข้อมูลจาก Google Sheets (ค่าเริ่มต้น: ทุก 10 วินาที)
+    const DEFAULT_GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxXU09E1IT1OX7E5zChPWs6RGKpGpdzXq-LrB-I5atgVtLj8kragj-Y3J0zoPU62VQofg/exec";
     const AUTO_REFRESH_INTERVAL_MS = 10000;
-
     let scriptUrl = localStorage.getItem('CR_GS_URL') || DEFAULT_GOOGLE_SCRIPT_URL;
     let soundEnabled = true;
     let alertedOverdueIds = new Set();
-
-    // ข้อมูลเริ่มต้น (จะถูกแทนที่ด้วยข้อมูลจริงจาก LocalStorage หรือ Google Sheets อัตโนมัติ)
-    let employees = [
-      { id: 'EMP001', pin: '1001', name: 'จิดาภา สุขสันต์', nickname: 'จูน', myanmarName: 'ဂျูน', zone: 'Frozen -25°C', role: 'Picker', otHours: 0 },
-      { id: 'EMP002', pin: '1002', name: 'ตะวันฉาย พรมมา', nickname: 'ตะวัน', myanmarName: 'တာဝန်', zone: 'Blast Freeze -35°C', role: 'Forklift', otHours: 2 },
-      { id: 'EMP003', pin: '1003', name: 'กนกวรรณ ใจดี', nickname: 'กนก', myanmarName: 'ကနုတ်', zone: 'Chiller 2°C', role: 'Checker', otHours: 0 },
-      { id: 'EMP004', pin: '1004', name: 'ณัฐพล คนขยัน', nickname: 'ณัฐ', myanmarName: 'နတ်', zone: 'Frozen -25°C', role: 'Loader', otHours: 1 },
-      { id: 'EMP005', pin: '1005', name: 'Aung Kyaw', nickname: 'อ่องจ่อ', myanmarName: 'အောင်ကျော်', zone: 'Frozen -25°C', role: 'Picker', otHours: 2 },
-      { id: 'EMP006', pin: '1006', name: 'Su Su', nickname: 'ซูซู', myanmarName: 'စုစု', zone: 'Chiller 2°C', role: 'Packer', otHours: 0 }
-    ];
-
+    let employees = [];
     let activeBreaks = [];
     let breakLogs = [];
     let dailyOtMap = {};
 
     function getTodayDateKey() {
       const now = new Date();
-      const y = now.getFullYear();
-      const m = String(now.getMonth() + 1).padStart(2, '0');
-      const d = String(now.getDate()).padStart(2, '0');
-      return `${y}-${m}-${d}`;
+      return now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
     }
 
-    // โหลดข้อมูลจาก LocalStorage (กรณีเปิดเครื่องเดียวกับจุดสแกนแต่ต่อจอแยก)
     function loadFromLocalStorage() {
       try {
         const rawEmp = localStorage.getItem('CR_EMPLOYEES');
         const rawAct = localStorage.getItem('CR_ACTIVE_BREAKS');
-        const rawLogs = localStorage.getItem('CR_BREAK_LOGS');
         const rawOt = localStorage.getItem('CR_DAILY_OT');
-
         if (rawEmp) employees = JSON.parse(rawEmp);
         if (rawAct) activeBreaks = JSON.parse(rawAct);
-        if (rawLogs) breakLogs = JSON.parse(rawLogs);
         if (rawOt) dailyOtMap = JSON.parse(rawOt);
-      } catch (e) {
-        console.warn('LocalStorage read error:', e);
-      }
+      } catch (e) {}
     }
 
-    // ดึงข้อมูลสดจาก Google Sheets
     async function pullFromGoogleSheets() {
-      const badge = document.getElementById('syncBadge');
       const statusText = document.getElementById('syncStatusText');
-
       if (!scriptUrl || !scriptUrl.includes('/exec')) {
         loadFromLocalStorage();
-        statusText.textContent = 'โหมดจอคู่ LocalStorage (ยังไม่ได้ใส่ลิงก์ Sheet)';
-        badge.className = 'inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-semibold rounded-full bg-sky-50 text-sky-700 border border-sky-200';
         renderTVScreen();
         return;
       }
-
       try {
-        statusText.textContent = 'กำลังซิงค์ข้อมูล...';
-        const res = await fetch(`${scriptUrl}?action=getAll&t=${Date.now()}`);
+        statusText.textContent = 'กำลังซิงค์ข้อมูลสด...';
+        const res = await fetch(scriptUrl + '?action=getAll&t=' + Date.now());
         const data = await res.json();
-
-        if (data && data.status === 'ok') {
+        if (data && (data.ok || data.status === 'ok')) {
           if (Array.isArray(data.employees) && data.employees.length > 0) employees = data.employees;
           if (Array.isArray(data.activeBreaks)) activeBreaks = data.activeBreaks;
           if (Array.isArray(data.breakLogs)) breakLogs = data.breakLogs;
           if (data.dailyOtMap) dailyOtMap = data.dailyOtMap;
-
-          const nowStr = new Date().toLocaleTimeString('th-TH', { hour12: false });
-          document.getElementById('lastPullTimeText').textContent = `อัปเดตจาก Cloud: ${nowStr}`;
-          statusText.textContent = `เชื่อมต่อ Google Sheets สด (อัปเดตทุก 10 วิ)`;
-          badge.className = 'inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-semibold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200';
+          document.getElementById('lastPullTimeText').textContent = 'อัปเดตจาก Cloud: ' + new Date().toLocaleTimeString('th-TH', { hour12: false });
+          statusText.textContent = 'เชื่อมต่อ Google Sheets สด (อัปเดตทุก 10 วิ)';
           renderTVScreen();
         }
       } catch (err) {
         loadFromLocalStorage();
-        statusText.textContent = 'ใช้ข้อมูลสำรองในเครื่อง (รอการเชื่อมต่อ)';
-        badge.className = 'inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-semibold rounded-full bg-amber-50 text-amber-700 border border-amber-200';
         renderTVScreen();
       }
     }
 
-    // คำนวณโควตาพักเบรกรายบุคคลของวันนี้
     function calculateEmployeeQuotaToday(emp) {
       const todayKey = getTodayDateKey();
-      const otKey = `${todayKey}_${emp.id}`;
+      const otKey = todayKey + '_' + emp.id;
       const otHours = (dailyOtMap[otKey] !== undefined) ? Number(dailyOtMap[otKey]) : (Number(emp.otHours) || 0);
-
       const coldQuotaMins = 120 + (otHours * 15);
       const mealQuotaMins = 80;
       const totalQuotaMins = coldQuotaMins + mealQuotaMins;
+      let coldUsedSec = 0, mealUsedSec = 0;
 
-      let coldUsedSec = 0;
-      let mealUsedSec = 0;
-
-      // รวมจากประวัติที่พักเสร็จแล้ววันนี้
       breakLogs.forEach(log => {
-        const logDate = log.dateKey || (log.startTime ? log.startTime.slice(0, 10) : todayKey);
-        if (log.empId === emp.id && logDate === todayKey) {
+        if (log.empId === emp.id && (log.dateKey || todayKey) === todayKey) {
           const sec = Number(log.durationSec) || ((Number(log.durationMins) || 0) * 60);
-          if (log.breakType === 'meal') mealUsedSec += sec;
+          if (String(log.breakType).toLowerCase() === 'meal') mealUsedSec += sec;
           else coldUsedSec += sec;
         }
       });
 
-      // รวมจากคนที่กำลังพักอยู่ในขณะนี้แบบเรียลไทม์
       const active = activeBreaks.find(a => a.empId === emp.id);
       if (active) {
-        const elapsedSec = Math.max(0, Math.floor((Date.now() - active.startTimestamp) / 1000));
-        if (active.breakType === 'meal') mealUsedSec += elapsedSec;
+        const elapsedSec = Math.max(0, Math.floor((Date.now() - Number(active.startTimestamp || active.startTimeMs)) / 1000));
+        if (String(active.breakType).toLowerCase() === 'meal') mealUsedSec += elapsedSec;
         else coldUsedSec += elapsedSec;
       }
 
       const coldUsedMins = Math.round(coldUsedSec / 60);
       const mealUsedMins = Math.round(mealUsedSec / 60);
       const totalUsedMins = coldUsedMins + mealUsedMins;
-
-      return {
-        otHours,
-        coldQuotaMins,
-        mealQuotaMins,
-        totalQuotaMins,
-        coldUsedMins,
-        mealUsedMins,
-        totalUsedMins,
-        remainingMins: totalQuotaMins - totalUsedMins,
-        isOverQuota: totalUsedMins > totalQuotaMins
-      };
-    }
-
-    // เสียงเตือนเมื่อมีพนักงานพักเกินเวลา
-    function playOverdueAlertSound() {
-      if (!soundEnabled) return;
-      try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        [0, 0.22].forEach(delay => {
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-          osc.type = 'sawtooth';
-          osc.frequency.setValueAtTime(880, ctx.currentTime + delay);
-          gain.gain.setValueAtTime(0.15, ctx.currentTime + delay);
-          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.18);
-          osc.connect(gain);
-          gain.connect(ctx.destination);
-          osc.start(ctx.currentTime + delay);
-          osc.stop(ctx.currentTime + delay + 0.18);
-        });
-      } catch (e) {}
+      return { otHours, coldQuotaMins, mealQuotaMins, totalQuotaMins, coldUsedMins, mealUsedMins, totalUsedMins, remainingMins: totalQuotaMins - totalUsedMins, isOverQuota: totalUsedMins > totalQuotaMins };
     }
 
     function formatMMSS(totalSeconds) {
       const absSec = Math.abs(Math.floor(totalSeconds));
-      const mins = Math.floor(absSec / 60);
-      const secs = absSec % 60;
-      return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+      return String(Math.floor(absSec / 60)).padStart(2, '0') + ':' + String(absSec % 60).padStart(2, '0');
     }
 
     function renderTVScreen() {
       const now = Date.now();
       const todayKey = getTodayDateKey();
+      let normalCount = 0, warningCount = 0, overdueCount = 0;
 
-      let normalCount = 0;
-      let warningCount = 0;
-      let overdueCount = 0;
-
-      // คำนวณสถานะผู้ที่กำลังพักเบรก
       const enrichedActive = activeBreaks.map(item => {
-        const emp = employees.find(e => e.id === item.empId) || {
-          id: item.empId,
-          name: item.empName || item.empId,
-          nickname: item.nickname || '',
-          myanmarName: item.myanmarName || '',
-          zone: item.zone || 'Frozen -25°C'
-        };
-        const limitMinutes = Number(item.limitMinutes) || (item.breakType === 'meal' ? 80 : 15);
-        const limitSec = limitMinutes * 60;
-        const elapsedSec = Math.max(0, Math.floor((now - item.startTimestamp) / 1000));
-        const remainSec = limitSec - elapsedSec;
-
+        const emp = employees.find(e => e.id === item.empId) || { id: item.empId, name: item.empName || item.empId, nickname: item.nickname || '', myanmarName: item.myanmarName || '', zone: item.zone || 'Frozen -25°C' };
+        const isMeal = String(item.breakType).toLowerCase() === 'meal';
+        const limitMinutes = Number(item.limitMinutes) || (isMeal ? 80 : 15);
+        const startMs = Number(item.startTimestamp || item.startTimeMs) || now;
+        const elapsedSec = Math.max(0, Math.floor((now - startMs) / 1000));
+        const remainSec = (limitMinutes * 60) - elapsedSec;
         let status = 'normal';
-        if (remainSec < 0) {
-          status = 'overdue';
-          overdueCount++;
-          if (!alertedOverdueIds.has(item.id || item.empId)) {
-            alertedOverdueIds.add(item.id || item.empId);
-            playOverdueAlertSound();
-          }
-        } else if (remainSec <= 120) {
-          status = 'warning';
-          warningCount++;
-        } else {
-          normalCount++;
-        }
-
-        return { ...item, emp, limitMinutes, limitSec, elapsedSec, remainSec, status };
+        if (remainSec < 0) { status = 'overdue'; overdueCount++; }
+        else if (remainSec <= 120) { status = 'warning'; warningCount++; }
+        else { normalCount++; }
+        return { ...item, emp, isMeal, limitMinutes, startMs, remainSec, status };
       });
 
-      // เรียงลำดับ: เกินเวลา -> ใกล้หมดเวลา -> ปกติ
       const rank = { overdue: 0, warning: 1, normal: 2 };
       enrichedActive.sort((a, b) => rank[a.status] - rank[b.status] || a.remainSec - b.remainSec);
 
-      // อัปเดตตัวเลข KPI ด้านบน
       document.getElementById('kpiTotalActive').textContent = enrichedActive.length;
       document.getElementById('kpiNormal').textContent = normalCount;
       document.getElementById('kpiWarning').textContent = warningCount;
@@ -451,209 +231,71 @@
       const todayLogs = breakLogs.filter(l => (l.dateKey || todayKey) === todayKey);
       const onTimeLogs = todayLogs.filter(l => !l.isOvertime).length;
       const onTimeRate = todayLogs.length > 0 ? Math.round((onTimeLogs / todayLogs.length) * 100) : 100;
-      document.getElementById('kpiCompletedToday').textContent = `${todayLogs.length} รอบ`;
-      document.getElementById('kpiOnTimeRate').textContent = `ตรงเวลา ${onTimeRate}%`;
+      document.getElementById('kpiCompletedToday').textContent = todayLogs.length + ' รอบ';
+      document.getElementById('kpiOnTimeRate').textContent = 'ตรงเวลา ' + onTimeRate + '%';
 
-      // วาดการ์ดคนที่กำลังพักเบรก
       const container = document.getElementById('activeBreakContainer');
       if (enrichedActive.length === 0) {
-        container.innerHTML = `
-          <div class="col-span-full flex flex-col items-center justify-center py-20 text-center border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50/60">
-            <div class="text-5xl mb-3">❄️</div>
-            <p class="text-xl font-extrabold text-slate-700">ขณะนี้ไม่มีพนักงานกำลังพักเบรก</p>
-            <p class="text-sm text-slate-500 mt-1">လက်ရှိ အနားယူနေသော ဝန်ထမ်းမရှိပါ • พนักงานทั้งหมดปฏิบัติงานอยู่ในโซนห้องเย็น</p>
-          </div>
-        `;
+        container.innerHTML = '<div class="col-span-full flex flex-col items-center justify-center py-20 text-center border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50/60"><div class="text-5xl mb-3">❄️</div><p class="text-xl font-extrabold text-slate-700">ขณะนี้ไม่มีพนักงานกำลังพักเบรก</p><p class="text-sm text-slate-500 mt-1">พนักงานทั้งหมดปฏิบัติงานอยู่ในโซนห้องเย็น</p></div>';
       } else {
         container.innerHTML = enrichedActive.map(item => {
           const quota = calculateEmployeeQuotaToday(item.emp);
-          const isMeal = item.breakType === 'meal';
-          const badgeType = isMeal
-            ? `<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-orange-100 text-orange-800 border border-orange-200">🍱 พักทานข้าว (${item.limitMinutes} น.)</span>`
-            : `<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-sky-100 text-sky-800 border border-sky-200">❄️ เบรกหนาว (${item.limitMinutes} น.)</span>`;
-
-          let cardClass = 'bg-white border-2 border-sky-200';
-          let timerColor = 'text-sky-600';
-          let statusPill = '<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-sky-100 text-sky-800">ปกติ (Normal)</span>';
-
-          if (item.status === 'overdue') {
-            cardClass = 'card-overdue border-2';
-            timerColor = 'text-red-600';
-            statusPill = '<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-600 text-white">🚨 เกินเวลา! (အချိန်ကျော်)</span>';
-          } else if (item.status === 'warning') {
-            cardClass = 'card-warning border-2';
-            timerColor = 'text-amber-600';
-            statusPill = '<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500 text-white">⏳ ใกล้หมดเวลา</span>';
-          }
-
-          const timerText = item.remainSec < 0
-            ? `+${formatMMSS(item.remainSec)}`
-            : formatMMSS(item.remainSec);
-
-          const startTimeFormatted = new Date(item.startTimestamp).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
-
-          return `
-            <div class="${cardClass} rounded-2xl p-4 shadow-sm flex flex-col justify-between transition">
-              <div class="flex items-start justify-between gap-2">
-                <div>
-                  <div class="flex items-center gap-2">
-                    <span class="text-xs font-mono-timer font-bold px-2 py-0.5 rounded bg-slate-900 text-white">${item.emp.id}</span>
-                    ${badgeType}
-                  </div>
-                  <h3 class="text-xl font-extrabold text-slate-900 mt-1.5">
-                    ${item.emp.name} ${item.emp.nickname ? `<span class="text-sky-600">(${item.emp.nickname})</span>` : ''}
-                  </h3>
-                  <p class="text-xs text-slate-500">${item.emp.myanmarName || ''} • โซน: <strong class="text-slate-700">${item.emp.zone}</strong></p>
-                </div>
-                ${statusPill}
-              </div>
-
-              <div class="my-3 py-2.5 px-4 rounded-xl bg-white/80 border border-slate-200/80 flex items-center justify-between">
-                <div>
-                  <p class="text-[11px] font-bold text-slate-400 uppercase">${item.remainSec < 0 ? 'เวลาที่เกินกำหนด' : 'เวลาคงเหลือ'}</p>
-                  <p class="text-xs text-slate-500">ออกพักเมื่อ ${startTimeFormatted} น.</p>
-                </div>
-                <div class="text-4xl font-extrabold font-mono-timer ${timerColor} tracking-tight">
-                  ${timerText}
-                </div>
-              </div>
-
-              <div class="flex items-center justify-between text-xs text-slate-600 pt-1 border-t border-slate-200/60">
-                <span>โควตาสะสมวันนี้: <strong>${quota.totalUsedMins} / ${quota.totalQuotaMins} นาที</strong></span>
-                <span class="${quota.isOverQuota ? 'text-red-600 font-bold' : 'text-emerald-700 font-semibold'}">
-                  ${quota.isOverQuota ? `เกินโควตา +${Math.abs(quota.remainingMins)} น.` : `เหลือ ${quota.remainingMins} น.`}
-                </span>
-              </div>
-            </div>
-          `;
+          const badgeType = item.isMeal
+            ? '<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-orange-100 text-orange-800 border border-orange-200">🍱 พักทานข้าว (' + item.limitMinutes + ' น.)</span>'
+            : '<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-sky-100 text-sky-800 border border-sky-200">❄️ เบรกหนาว (' + item.limitMinutes + ' น.)</span>';
+          let cardClass = 'bg-white border-2 border-sky-200', timerColor = 'text-sky-600', statusPill = '<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-sky-100 text-sky-800">ปกติ</span>';
+          if (item.status === 'overdue') { cardClass = 'card-overdue border-2'; timerColor = 'text-red-600'; statusPill = '<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-600 text-white">🚨 เกินเวลา!</span>'; }
+          else if (item.status === 'warning') { cardClass = 'card-warning border-2'; timerColor = 'text-amber-600'; statusPill = '<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500 text-white">⏳ ใกล้หมดเวลา</span>'; }
+          const timerText = item.remainSec < 0 ? ('+' + formatMMSS(item.remainSec)) : formatMMSS(item.remainSec);
+          const startTimeText = item.startTime || new Date(item.startMs).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+          const endTimeText = item.expectedEndTime || new Date(item.startMs + item.limitMinutes * 60000).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+          return '<div class="' + cardClass + ' rounded-2xl p-4 shadow-sm flex flex-col justify-between transition">' +
+            '<div class="flex items-start justify-between gap-2"><div><div class="flex items-center gap-2"><span class="text-xs font-mono-timer font-bold px-2 py-0.5 rounded bg-slate-900 text-white">' + item.emp.id + '</span>' + badgeType + '</div>' +
+            '<h3 class="text-xl font-extrabold text-slate-900 mt-1.5">' + item.emp.name + ' (' + item.emp.nickname + ')</h3>' +
+            '<p class="text-xs text-slate-500">โซน: <strong class="text-slate-700">' + item.emp.zone + '</strong></p></div>' + statusPill + '</div>' +
+            '<div class="my-3 py-2.5 px-4 rounded-xl bg-white/80 border border-slate-200/80 flex items-center justify-between">' +
+            '<div><p class="text-[11px] font-bold text-slate-400 uppercase">' + (item.remainSec < 0 ? 'เวลาที่เกินกำหนด' : 'เวลาคงเหลือ') + '</p>' +
+            '<p class="text-xs text-slate-600 font-semibold">เริ่มพัก: ' + startTimeText + ' น. | ครบกำหนด: ' + endTimeText + ' น.</p></div>' +
+            '<div class="text-4xl font-extrabold font-mono-timer ' + timerColor + ' tracking-tight">' + timerText + '</div></div>' +
+            '<div class="flex items-center justify-between text-xs text-slate-600 pt-1 border-t border-slate-200/60">' +
+            '<span>โควตาสะสมวันนี้: <strong>' + quota.totalUsedMins + ' / ' + quota.totalQuotaMins + ' นาที</strong></span>' +
+            '<span class="' + (quota.isOverQuota ? 'text-red-600 font-bold' : 'text-emerald-700 font-semibold') + '">' +
+            (quota.isOverQuota ? ('เกินโควตา +' + Math.abs(quota.remainingMins) + ' น.') : ('เหลือ ' + quota.remainingMins + ' น.')) + '</span></div></div>';
         }).join('');
       }
 
-      // วาดตารางสรุปโควตารายบุคคลด้านขวา
-      document.getElementById('quotaSummaryCount').textContent = `${employees.length} คน`;
-      const quotaTbody = document.getElementById('tvQuotaTableBody');
-      quotaTbody.innerHTML = employees.map(emp => {
+      document.getElementById('quotaSummaryCount').textContent = employees.length + ' คน';
+      document.getElementById('tvQuotaTableBody').innerHTML = employees.map(emp => {
         const q = calculateEmployeeQuotaToday(emp);
-        const isActive = activeBreaks.some(a => a.empId === emp.id);
-        return `
-          <tr class="${isActive ? 'bg-sky-50/70' : ''} hover:bg-slate-50">
-            <td class="py-2.5 px-2">
-              <div class="font-bold text-slate-900 flex items-center gap-1.5">
-                ${isActive ? '<span class="w-2 h-2 rounded-full bg-sky-500 animate-ping"></span>' : ''}
-                <span>${emp.name}</span>
-                ${emp.nickname ? `<span class="text-slate-500 font-normal">(${emp.nickname})</span>` : ''}
-              </div>
-              <div class="text-[11px] text-slate-400">${emp.id} • ${emp.zone} ${q.otHours > 0 ? `<span class="text-indigo-600 font-semibold">• OT ${q.otHours}ชม.</span>` : ''}</div>
-            </td>
-            <td class="py-2.5 px-2 text-center font-mono-timer font-semibold text-sky-700">
-              ${q.coldUsedMins}/${q.coldQuotaMins}น.
-            </td>
-            <td class="py-2.5 px-2 text-center font-mono-timer font-semibold text-orange-700">
-              ${q.mealUsedMins}/${q.mealQuotaMins}น.
-            </td>
-            <td class="py-2.5 px-2 text-center font-mono-timer font-bold text-slate-900">
-              ${q.totalUsedMins} / ${q.totalQuotaMins} น.
-            </td>
-            <td class="py-2.5 px-2 text-right">
-              ${q.isOverQuota
-                ? `<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-red-100 text-red-700">เกิน +${Math.abs(q.remainingMins)}น.</span>`
-                : `<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-700">เหลือ ${q.remainingMins}น.</span>`
-              }
-            </td>
-          </tr>
-        `;
+        return '<tr class="hover:bg-slate-50"><td class="py-2.5 px-2"><div class="font-bold text-slate-900">' + emp.name + ' (' + emp.nickname + ')</div><div class="text-[11px] text-slate-400">' + emp.id + ' • ' + emp.zone + '</div></td>' +
+          '<td class="py-2.5 px-2 text-center font-mono-timer font-semibold text-sky-700">' + q.coldUsedMins + '/' + q.coldQuotaMins + 'น.</td>' +
+          '<td class="py-2.5 px-2 text-center font-mono-timer font-semibold text-orange-700">' + q.mealUsedMins + '/' + q.mealQuotaMins + 'น.</td>' +
+          '<td class="py-2.5 px-2 text-center font-mono-timer font-bold text-slate-900">' + q.totalUsedMins + ' / ' + q.totalQuotaMins + ' น.</td>' +
+          '<td class="py-2.5 px-2 text-right">' + (q.isOverQuota ? ('<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-red-100 text-red-700">เกิน +' + Math.abs(q.remainingMins) + 'น.</span>') : ('<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-700">เหลือ ' + q.remainingMins + 'น.</span>')) + '</td></tr>';
       }).join('');
 
-      // วาดรายการสแกนกลับเข้าห้องเย็นล่าสุด
-      const recentContainer = document.getElementById('recentLogsList');
       const recentFive = [...todayLogs].slice(-5).reverse();
-      if (recentFive.length === 0) {
-        recentContainer.innerHTML = `<p class="text-xs text-slate-400 py-3 text-center">ยังไม่มีประวัติการสแกนกลับเข้าห้องเย็นในวันนี้</p>`;
-      } else {
-        recentContainer.innerHTML = recentFive.map(log => `
-          <div class="flex items-center justify-between px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-100 text-xs">
-            <div class="flex items-center gap-2">
-              <span class="font-mono-timer font-bold text-slate-700">${log.empId}</span>
-              <span class="font-bold text-slate-900">${log.empName || ''}</span>
-              <span class="text-slate-400">(${log.breakType === 'meal' ? 'ทานข้าว' : 'เบรกหนาว'})</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="font-mono-timer font-semibold text-slate-700">ใช้ไป ${log.durationMins || Math.round((log.durationSec || 0)/60)} นาที</span>
-              ${log.isOvertime
-                ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-700">เกินเวลา</span>'
-                : '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700">ตรงเวลา</span>'
-              }
-            </div>
-          </div>
-        `).join('');
-      }
+      document.getElementById('recentLogsList').innerHTML = recentFive.length === 0
+        ? '<p class="text-xs text-slate-400 py-3 text-center">ยังไม่มีประวัติการสแกนกลับเข้าห้องเย็นในวันนี้</p>'
+        : recentFive.map(log => '<div class="flex items-center justify-between px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-100 text-xs"><div class="flex items-center gap-2"><span class="font-mono-timer font-bold text-slate-700">' + log.empId + '</span><span class="font-bold text-slate-900">' + (log.empName || '') + '</span></div><div class="flex items-center gap-2"><span class="font-mono-timer font-semibold text-slate-700">ใช้ไป ' + (log.durationMins || Math.round((log.durationSec || 0)/60)) + ' นาที</span></div></div>').join('');
     }
 
-    // นาฬิกาดิจิทัลบนหัวจอทีวี
     function updateClock() {
       const now = new Date();
       document.getElementById('tvClockText').textContent = now.toLocaleTimeString('th-TH', { hour12: false });
-      document.getElementById('tvDateText').textContent = now.toLocaleDateString('th-TH', {
-        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
-      });
+      document.getElementById('tvDateText').textContent = now.toLocaleDateString('th-TH', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
     }
+    function toggleSound() { soundEnabled = !soundEnabled; document.getElementById('soundIcon').textContent = soundEnabled ? '🔔' : '🔕'; }
+    function toggleFullScreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {}); else document.exitFullscreen(); }
 
-    function toggleSound() {
-      soundEnabled = !soundEnabled;
-      document.getElementById('soundIcon').textContent = soundEnabled ? '🔔' : '🔕';
-      document.getElementById('soundLabel').textContent = soundEnabled ? 'เสียงเตือน: เปิด' : 'เสียงเตือน: ปิด';
-    }
-
-    function toggleFullScreen() {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(() => {});
-      } else {
-        document.exitFullscreen();
-      }
-    }
-
-    function openUrlConfigModal() {
-      document.getElementById('inputScriptUrl').value = scriptUrl;
-      document.getElementById('urlModal').classList.remove('hidden');
-      document.getElementById('urlModal').classList.add('flex');
-    }
-
-    function closeUrlConfigModal() {
-      document.getElementById('urlModal').classList.add('hidden');
-      document.getElementById('urlModal').classList.remove('flex');
-    }
-
-    function saveScriptUrl() {
-      const val = document.getElementById('inputScriptUrl').value.trim();
-      scriptUrl = val;
-      localStorage.setItem('CR_GS_URL', val);
-      closeUrlConfigModal();
-      pullFromGoogleSheets();
-    }
-
-    // ซิงค์ทันทีเมื่อเปิดคู่กับหน้า Kiosk บนคอมเครื่องเดียวกัน
-    window.addEventListener('storage', () => {
-      loadFromLocalStorage();
-      renderTVScreen();
-    });
-
-    // เริ่มทำงานทันทีเมื่อเปิดหน้าเว็บ
+    window.addEventListener('storage', () => { loadFromLocalStorage(); renderTVScreen(); });
     window.addEventListener('DOMContentLoaded', () => {
       loadFromLocalStorage();
       updateClock();
       renderTVScreen();
       pullFromGoogleSheets();
-
-      // นับถอยหลังทุก 1 วินาที
-      setInterval(() => {
-        updateClock();
-        renderTVScreen();
-      }, 1000);
-
-      // ดึงข้อมูลจาก Google Sheets อัตโนมัติทุก 10 วินาที
-      setInterval(() => {
-        pullFromGoogleSheets();
-      }, AUTO_REFRESH_INTERVAL_MS);
+      setInterval(() => { updateClock(); renderTVScreen(); }, 1000);
+      setInterval(() => { pullFromGoogleSheets(); }, AUTO_REFRESH_INTERVAL_MS);
     });
   </script>
 </body>
